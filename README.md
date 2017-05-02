@@ -34,13 +34,17 @@ npm start
 
 ## What's in
 
+- UI Screens
+    -  Home
+    -  Todo MVC
+    -  Dashboard (works on Linux and Mac right now, use os-top to get os data, will support Windows soon)
 - Code structure (simple but scalable). 
     - web/ is the output dir.
     - src/ are the source files to be compiled into web/ folder.
     - src/view structure view components.
     - Three output files app-bundle.js (app code), lib-bundle.js (3rd party lib), all-bundle.css.
 - build system
-    - gulp / browserify / handlebar compiler / source map.
+    - gulp-less build with (browserify, postcss, handlebars precompilation)
 - App Patterns
     -  Simple but scalable (i.e. distributed) routing system & navigation.
     -  CSS Flexbox app layout.
@@ -48,8 +52,9 @@ npm start
 
 ## What's next
 
+- Dashboard for Windows (os-top will use wmic to mimic linux/osx top)
+- Graph on Dashboard
 - Add TodoMVC module (first with a client in memory management).
-- Continue dashboard (table content).
 - More CSS Flexbox patterns.
     - Form / fields patterns.
     - Continue table layout with flexbox (scrolling, resizing, ...).
