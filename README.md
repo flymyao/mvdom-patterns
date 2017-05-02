@@ -1,7 +1,7 @@
+mvdom-patterns is a set of UI components and mini applications put together into an application to illustrate some simple but scalable DOM and Javascript Centric patterns to build scalable application.
+
 
 ## Concept
-
-Some simple but scalable DOM and Javascript Centric patterns to build scalable application.
 
 - Simple scale better. 
 - Patterns outlast frameworks.
@@ -10,6 +10,12 @@ Some simple but scalable DOM and Javascript Centric patterns to build scalable a
 - Frameworks comes and go, runtimes last.
 
 Used right, the DOM does not need much to become a strong foundation for scalable application model. Here are some of those patterns using the mvDom DOM Centric micro-framework (< 12kb).
+
+
+## Live Demo
+
+http://52.11.174.212:8686/
+
 
 ## Install & build and run
 
