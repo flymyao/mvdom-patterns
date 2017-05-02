@@ -1,4 +1,4 @@
-mvdom-patterns is a set of UI components and mini applications put together into an application to illustrate some simple but scalable DOM and Javascript Centric patterns to build scalable application.
+mvdom-patterns is a set of mini applications put together to illustrate some simple but scalable DOM and Javascript Centric patterns to build simple to advanced applications. YES, simple scale better!
 
 
 ## Concept
