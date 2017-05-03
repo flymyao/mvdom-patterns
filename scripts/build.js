@@ -86,7 +86,7 @@ function* tmpl(){
 
 function* watch(){
 	// first we build all
-	yield _default();
+	yield* _default();
 
 	utils.watch(["src/js-lib/"], ".js", (action, name) => {
 		async6.run(js("lib"));
