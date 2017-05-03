@@ -28,6 +28,10 @@ const webDir = path.join(baseDir, "web/");
 const jsDistDir = path.resolve(webDir, "js/");
 const cssDistDir = path.resolve(webDir, "css/");
 
+const jsSrcDirs = ["src/js-app/","src/view/","src/elem/"];
+const pcssSrcDirs = ["src/pcss/","src/view/","src/elem/"];
+const tmplSrcDirs = ["src/view/"];
+
 // we route the command to the appropriate function
 router({_default, js, css, tmpl, watch}).route();
 
@@ -48,7 +52,7 @@ function* js(mode){
 	}
 
 	if (!mode || mode === "app"){
-		yield browserifyFiles(utils.listFilesSync(["src/js-app/","src/view/"], ".js"), 
+		yield browserifyFiles(utils.listFilesSync(jsSrcDirs, ".js"), 
 													path.join(webDir, "js/app-bundle.js"));
 	}
 }
@@ -56,7 +60,7 @@ function* js(mode){
 function* css(){
 	ensureDist();
 
-	yield* pcssFiles(utils.listFilesSync(["src/pcss/","src/view/"], ".pcss"), 
+	yield* pcssFiles(utils.listFilesSync(pcssSrcDirs, ".pcss"), 
 									path.join(cssDistDir, "all-bundle.css"));
 
 }
@@ -69,7 +73,7 @@ function* tmpl(){
 
 	console.log("template - " + distFile);
 
-	var files = utils.listFilesSync("src/view/", ".tmpl");
+	var files = utils.listFilesSync(tmplSrcDirs, ".tmpl");
 
 	var templateContent = [];
 
@@ -92,15 +96,15 @@ function* watch(){
 		async6.run(js("lib"));
 	});
 
-	utils.watch(["src/js-app/","src/view/"], ".js", (action, name) => {
+	utils.watch(jsSrcDirs, ".js", (action, name) => {
 		async6.run(js("app"));
 	});	
 
-	utils.watch(["src/pcss/","src/view/"], ".css", (action, name) => {
+	utils.watch(pcssSrcDirs, ".pcss", (action, name) => {
 		async6.run(css());
 	});	
 
-	utils.watch(["src/view/"], ".tmpl", (action, name) => {
+	utils.watch(tmplSrcDirs, ".tmpl", (action, name) => {
 		async6.run(tmpl());
 	});
 }
