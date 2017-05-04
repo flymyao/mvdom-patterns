@@ -9,18 +9,26 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 });
 
-
-Handlebars.registerHelper("elem-toggle", function (on) {
+// {{elem-toggle true}}
+// {{elem-toggle}}
+// {{elem-toggle false "disabled"}} or false
+Handlebars.registerHelper("elem-toggle", function (on, disabled) {
 	var strs = [];
+
 	strs.push("<div class='elem-toggle ");
 
-	if (on){
+	if (on == true){
 		strs.push("on");
 	}
 
+	if(arguments.length > 2 && disabled === "disabled"){
+		strs.push(" disabled ");
+	}
+
+
 	strs.push("'>");
 
-	strs.push("<div class='circle'></div></div>");
+	strs.push("</div>");
 
 	return strs.join("");
 });
