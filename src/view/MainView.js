@@ -5,7 +5,8 @@ var utils = require("../js-app/utils.js");
 var pathToView = {
 	"": "HomeView", 
 	"todo": "TodoMainView", 
-	"dash": "DashMainView"
+	"dash": "DashMainView", 
+	"postr": "PostrMainView"
 };
 
 
