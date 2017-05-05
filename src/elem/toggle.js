@@ -3,7 +3,7 @@ var d = mvdom;
 document.addEventListener("DOMContentLoaded", function(event) {
 
 	d.on(document, "click", ".elem-toggle", function(evt){
-		var toggleEl = d.closest(evt.target, ".elem-toggle");
+		var toggleEl = evt.selectTarget;
 		toggleEl.classList.toggle("on");
 	});
 
@@ -24,7 +24,6 @@ Handlebars.registerHelper("elem-toggle", function (on, disabled) {
 	if(arguments.length > 2 && disabled === "disabled"){
 		strs.push(" disabled ");
 	}
-
 
 	strs.push("'>");
 
