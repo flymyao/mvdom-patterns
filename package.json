@@ -38,5 +38,8 @@
     "start": "node ./mock-server/start.js",
     "build": "node ./scripts/build.js"
   },
+  "engines": {
+    "node": ">=7.10.0"
+  },
   "author": "Jeremy Chone <jeremy.chone@gmail.com> (http://jeremychone.com)"
 }

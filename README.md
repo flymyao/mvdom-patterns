@@ -1,6 +1,7 @@
 mvdom-patterns is a set of mini applications put together to illustrate some simple but scalable DOM and Javascript Centric patterns to build small to advanced Web applications. YES, simple scale better!
 
 
+
 ## Concept
 
 - Simple scale better. 
@@ -19,7 +20,8 @@ http://52.11.174.212:8686/
 
 ## Install & build and run
 
-Requirement: node.js >6.x
+Requirement: node.js > 7.10 (why: node 8 is around the corner, and async/await is game changer in code readibility, so, let start moving!)
+
 
 ```
 git clone git@github.com:mvdom/mvdom-patterns.git
