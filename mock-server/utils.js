@@ -1,8 +1,3 @@
-const async6 = require('async6');
-const run = async6.run;
-
-'use strict';
-
 module.exports = {
 	HapiAsync: HapiAsync,
 	isNull: isNull,
@@ -44,17 +39,7 @@ function isEmpty(v){
 	return false;
 }
 
-function isGeneratorFunction(obj) {
-	var constructor = obj.constructor;
-	if (!constructor) 
-		return false;
 
-	if ('GeneratorFunction' === constructor.name || 'GeneratorFunction' === constructor.displayName){
-		return true;
-	}else{
-		return false;
-	}
-}
 
 // --------- /Object Utils --------- //
 
@@ -73,15 +58,8 @@ HapiAsync.attributes = {
 };
 
 function asyncHandler(route, options){
-	var isGen = isGeneratorFunction(options);
-
-	const handler = (request, reply) => {
-		var it = options(request, reply);
-
-		// iterate only if it is a "options" was a generation function
-		if (isGen){
-			run(it);
-		}
+	const handler = async (request, reply) => {
+		await options(request, reply);
 	};
 	return handler;
 }

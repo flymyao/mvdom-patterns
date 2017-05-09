@@ -6,8 +6,6 @@ const exec = require( 'child_process' ).exec;
 
 const HapiAsync = require('./utils.js').HapiAsync;
 
-const run = require('async6').run;
-
 var isWin = /^win/.test( process.platform );
 
 // Default app config. 
@@ -29,16 +27,17 @@ class Server{
 	constructor(){
 	}
 
-	init(cfg){
+	async init(cfg){
 
 		this.cfg = Object.assign({},defaultCfg,cfg);
 
-		function* _init(){
+		async function _init(){
 			console.log("___init");
-			yield initServer.call(this);
+			var r = await initServer.call(this);
+			return r;
 		}	
 
-		return run(_init.call(this));
+		return _init.call(this);
 
 	}
 
