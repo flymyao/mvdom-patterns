@@ -6,8 +6,6 @@ const exorcist = require("exorcist");
 const postcss = require("postcss");
 const hbsPrecompile = require("hbsp").precompile; // promise style
 
-const utils = require("./utils.js");
-
 const processors = [
 	require("postcss-import"),
 	require("postcss-mixins"),
@@ -43,12 +41,12 @@ async function js(mode){
 	ensureDist();
 
 	if (!mode || mode === "lib"){
-		await browserifyFiles(utils.listFilesSync("src/js-lib/", ".js"), 
+		await browserifyFiles(await fs.listFiles("src/js-lib/", ".js"), 
 													path.join(webDir, "js/lib-bundle.js"));
 	}
 
 	if (!mode || mode === "app"){
-		await browserifyFiles(utils.listFilesSync(jsSrcDirs, ".js"), 
+		await browserifyFiles(await fs.listFiles(jsSrcDirs, ".js"), 
 													path.join(webDir, "js/app-bundle.js"));
 	}
 }
@@ -56,7 +54,7 @@ async function js(mode){
 async function css(){
 	ensureDist();
 
-	await pcssFiles(utils.listFilesSync(pcssSrcDirs, ".pcss"), 
+	await pcssFiles(await fs.listFiles(pcssSrcDirs, ".pcss"), 
 									path.join(cssDistDir, "all-bundle.css"));
 
 }
@@ -65,11 +63,11 @@ async function tmpl(){
 	ensureDist();
 
 	var distFile = path.join(webDir, "js/templates.js");
-	utils.removeFilesSync([distFile]);
+	await fs.unlinkFiles([distFile]);
 
 	console.log("template - " + distFile);
 
-	var files = utils.listFilesSync(tmplSrcDirs, ".tmpl");
+	var files = await fs.listFiles(tmplSrcDirs, ".tmpl");
 
 	var templateContent = [];
 
@@ -88,19 +86,21 @@ async function watch(){
 	// first we build all
 	await _default();
 
-	utils.watch(["src/js-lib/"], ".js", (action, name) => {
+	// NOTE: here we do not need to do await (even if we could) as it is fine to not do them sequentially. 
+	
+	fs.watchDirs(["src/js-lib/"], ".js", (action, name) => {
 		js("lib");
 	});
 
-	utils.watch(jsSrcDirs, ".js", (action, name) => {
+	fs.watchDirs(jsSrcDirs, ".js", (action, name) => {
 		js("app");
 	});	
 
-	utils.watch(pcssSrcDirs, ".pcss", (action, name) => {
+	fs.watchDirs(pcssSrcDirs, ".pcss", (action, name) => {
 		css();
 	});	
 
-	utils.watch(tmplSrcDirs, ".tmpl", (action, name) => {
+	fs.watchDirs(tmplSrcDirs, ".tmpl", (action, name) => {
 		tmpl();
 	});
 }
@@ -119,7 +119,7 @@ async function pcssFiles(entries, distFile){
 	console.log("postcss - " + distFile);
 
 	var mapFile = distFile + ".map";	
-	utils.removeFilesSync([distFile, mapFile]);
+	await fs.unlinkFiles([distFile, mapFile]);
 
 	var processor = postcss(processors);
 	var pcssNodes = [];
@@ -152,11 +152,11 @@ async function pcssFiles(entries, distFile){
 	await fs.writeFile(mapFile, pcssResult.map, "utf8");
 }
 
-function browserifyFiles(entries, distFile){
+async function browserifyFiles(entries, distFile){
 	console.log("browserify - " + distFile);
 
 	var mapFile = distFile + ".map";	
-	utils.removeFilesSync([distFile, mapFile]);
+	await fs.unlinkFiles([distFile, mapFile]);
 
 	var b = browserify({ 
 		entries,
