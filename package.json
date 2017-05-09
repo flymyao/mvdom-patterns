@@ -3,19 +3,28 @@
   "version": "1.2.1-SNAPSHOT",
   "description": "mvDom patterns",
   "main": "start.js",
-  "keywords":["mvdom", "DOM Centric", "Patterns", "html5", "html", "framework", "mvc", "web-framework", "handlebars"],  
+  "keywords": [
+    "mvdom",
+    "DOM Centric",
+    "Patterns",
+    "html5",
+    "html",
+    "framework",
+    "mvc",
+    "web-framework",
+    "handlebars"
+  ],
   "dependencies": {
     "mvdom": "*",
     "os-top": "*",
     "inert": "*",
-		"hapi": "*"
+    "hapi": "*"
   },
   "devDependencies": {
-    "async6": "*",
     "browserify": "*",
     "cmdrouter": "^0.1.0",
     "exorcist": "^0.4.0",
-    "fs-extra": "*",
+    "fs-extra-plus": "^0.1.0",
     "hbsp": "*",
     "postcss": "^5.2.17",
     "postcss-cssnext": "*",
@@ -24,12 +33,10 @@
     "postcss-nested": "*",
     "postcss-simple-vars": "*"
   },
-
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./mock-server/start.js",
     "build": "node ./scripts/build.js"
   },
-
   "author": "Jeremy Chone <jeremy.chone@gmail.com> (http://jeremychone.com)"
 }

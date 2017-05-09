@@ -1,16 +1,12 @@
 const router = require("cmdrouter");
-const async6 = require("async6");
 const browserify = require("browserify");
 const path = require("path");
-const fs = require("fs-extra");
+const fs = require("fs-extra-plus");
 const exorcist = require("exorcist");
 const postcss = require("postcss");
 const hbsPrecompile = require("hbsp").precompile; // promise style
 
 const utils = require("./utils.js");
-
-const readFile = async6.promisify(fs.readFile, fs);
-const writeFile = async6.promisify(fs.writeFile, fs);
 
 const processors = [
 	require("postcss-import"),
@@ -37,35 +33,35 @@ router({_default, js, css, tmpl, watch}).route();
 
 
 // --------- Command Functions --------- //
-function* _default(){
-	yield* js();
-	yield* css();
-	yield* tmpl();
+async function _default(){
+	await js();
+	await css();
+	await tmpl();
 }
 
-function* js(mode){
+async function js(mode){
 	ensureDist();
 
 	if (!mode || mode === "lib"){
-		yield browserifyFiles(utils.listFilesSync("src/js-lib/", ".js"), 
+		await browserifyFiles(utils.listFilesSync("src/js-lib/", ".js"), 
 													path.join(webDir, "js/lib-bundle.js"));
 	}
 
 	if (!mode || mode === "app"){
-		yield browserifyFiles(utils.listFilesSync(jsSrcDirs, ".js"), 
+		await browserifyFiles(utils.listFilesSync(jsSrcDirs, ".js"), 
 													path.join(webDir, "js/app-bundle.js"));
 	}
 }
 
-function* css(){
+async function css(){
 	ensureDist();
 
-	yield* pcssFiles(utils.listFilesSync(pcssSrcDirs, ".pcss"), 
+	await pcssFiles(utils.listFilesSync(pcssSrcDirs, ".pcss"), 
 									path.join(cssDistDir, "all-bundle.css"));
 
 }
 
-function* tmpl(){
+async function tmpl(){
 	ensureDist();
 
 	var distFile = path.join(webDir, "js/templates.js");
@@ -79,33 +75,33 @@ function* tmpl(){
 
 	for (let file of files){
 
-		let htmlTemplate = yield readFile(file, "utf8");
-		let template = yield hbsPrecompile(file, htmlTemplate);
+		let htmlTemplate = await fs.readFile(file, "utf8");
+		let template = await hbsPrecompile(file, htmlTemplate);
 		templateContent.push(template);
 	}
 
-	writeFile(distFile,templateContent.join("\n"),"utf8");
+	await fs.writeFile(distFile,templateContent.join("\n"),"utf8");
 }
 
 
-function* watch(){
+async function watch(){
 	// first we build all
-	yield* _default();
+	await _default();
 
 	utils.watch(["src/js-lib/"], ".js", (action, name) => {
-		async6.run(js("lib"));
+		js("lib");
 	});
 
 	utils.watch(jsSrcDirs, ".js", (action, name) => {
-		async6.run(js("app"));
+		js("app");
 	});	
 
 	utils.watch(pcssSrcDirs, ".pcss", (action, name) => {
-		async6.run(css());
+		css();
 	});	
 
 	utils.watch(tmplSrcDirs, ".tmpl", (action, name) => {
-		async6.run(tmpl());
+		tmpl();
 	});
 }
 // --------- /Command Functions --------- //
@@ -119,7 +115,7 @@ function ensureDist(){
 	fs.ensureDirSync(cssDistDir);
 }
 
-function* pcssFiles(entries, distFile){
+async function pcssFiles(entries, distFile){
 	console.log("postcss - " + distFile);
 
 	var mapFile = distFile + ".map";	
@@ -131,7 +127,7 @@ function* pcssFiles(entries, distFile){
 	// we parse all of the .pcss files
 	for (let srcFile of entries){
 		// read the file
-		let pcss = yield readFile(srcFile, "utf8");
+		let pcss = await fs.readFile(srcFile, "utf8");
 
 		var pcssNode = postcss.parse(pcss, {
 			from: srcFile
@@ -147,13 +143,13 @@ function* pcssFiles(entries, distFile){
 	var rootNodeResult = rootNode.toResult();
 
 	// we process the rootNodeResult
-	var pcssResult = yield processor.process(rootNodeResult,{
+	var pcssResult = await processor.process(rootNodeResult,{
 		to: distFile,
 		map: { inline: false}});
 
 	// we write the .css and .map files
-	yield writeFile(distFile, pcssResult.css, "utf8");
-	yield writeFile(mapFile, pcssResult.map, "utf8");
+	await fs.writeFile(distFile, pcssResult.css, "utf8");
+	await fs.writeFile(mapFile, pcssResult.map, "utf8");
 }
 
 function browserifyFiles(entries, distFile){
