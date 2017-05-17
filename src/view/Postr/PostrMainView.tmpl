@@ -4,22 +4,32 @@
 		<section class="content">
 			<div class="form">
 
-				<div class="group">
-					<input type="text" required>
+				<div class="field in-line">
+					<input type="text" name="title" class="dx" required>
 					<span class="bar"></span>
 					<label>Title</label>
 				</div>
 					
-				<div class="group">      
-					<input type="text" required>
+				<div class="field in-line">      
+					<input type="text" name="link" class="dx" required>
 					<span class="bar"></span>
 					<label>Link (Optional)</label>
 				</div>
 				
-
-				<div class="group">
-					{{{elem-toggle true}}}
+				<div class="field in-line">      
+					<textarea name="txt" class="dx dx-txt" required></textarea>
+					<span class="bar"></span>
+					<label>Text</label>
 				</div>
+
+				<div class="field hor">
+					<div class="ipt switch dx dx-editable" tabindex="0"></div>
+					<label>Editable</label>
+				</div>
+
+				<footer>
+				<div class="btn">Save</div>
+				</footer>
 			</div>
 		</section>
 	</div>
