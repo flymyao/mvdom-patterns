@@ -116,36 +116,46 @@ function ensureDist(){
 }
 
 async function pcssFiles(entries, distFile){
+	
+
+	try{
+		var mapFile = distFile + ".map";	
+		await fs.unlinkFiles([distFile, mapFile]);
+
+		var processor = postcss(processors);
+		var pcssNodes = [];
+
+		// we parse all of the .pcss files
+		for (let srcFile of entries){
+			// read the file
+			let pcss = await fs.readFile(srcFile, "utf8");
+
+			var pcssNode = postcss.parse(pcss, {
+				from: srcFile
+			});
+			pcssNodes.push(pcssNode);
+		}
+
+		// build build the combined rootNode and its result
+		var rootNode = null;
+		for (let pcssNode of pcssNodes){
+			rootNode = (rootNode)?rootNode.append(pcssNode):pcssNode;
+		}
+		var rootNodeResult = rootNode.toResult();
+
+		// we process the rootNodeResult
+		var pcssResult = await processor.process(rootNodeResult,{
+			to: distFile,
+			map: { inline: false}});
+	}catch(ex){
+		console.log(`postcss ERROR - Cannot process ${distFile} because (setting css empty file) \n${ex}`);
+		// we write the .css and .map files
+		await fs.writeFile(distFile, "", "utf8");
+		await fs.writeFile(mapFile, "", "utf8");		
+		return;
+	}
+
 	console.log("postcss - " + distFile);
-
-	var mapFile = distFile + ".map";	
-	await fs.unlinkFiles([distFile, mapFile]);
-
-	var processor = postcss(processors);
-	var pcssNodes = [];
-
-	// we parse all of the .pcss files
-	for (let srcFile of entries){
-		// read the file
-		let pcss = await fs.readFile(srcFile, "utf8");
-
-		var pcssNode = postcss.parse(pcss, {
-			from: srcFile
-		});
-		pcssNodes.push(pcssNode);
-	}
-
-	// build build the combined rootNode and its result
-	var rootNode = null;
-	for (let pcssNode of pcssNodes){
-		rootNode = (rootNode)?rootNode.append(pcssNode):pcssNode;
-	}
-	var rootNodeResult = rootNode.toResult();
-
-	// we process the rootNodeResult
-	var pcssResult = await processor.process(rootNodeResult,{
-		to: distFile,
-		map: { inline: false}});
 
 	// we write the .css and .map files
 	await fs.writeFile(distFile, pcssResult.css, "utf8");
