@@ -1,5 +1,6 @@
+@import "../pcss/utils.pcss";
+
 button, .btn{
-	
 	border: none;
 	border-radius: 2px;
 	display: inline-block;
@@ -11,9 +12,19 @@ button, .btn{
 	-webkit-tap-highlight-color: transparent;
 	cursor: pointer;
 	transition: .3s ease-out;
+	position: relative;
+	overflow: hidden;
+	user-select: none;
 	
 	&:hover{
 		background-color: #DFDFDF;
 	}
+
+	&:focus{
+		outline: none;
+		background-color: #DFDFDF;
+	}
+
+	@mixin ripple;
 
 }
