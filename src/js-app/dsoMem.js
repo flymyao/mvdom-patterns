@@ -32,7 +32,7 @@ module.exports = DsoMem;
 
 // --------- DSO Apis --------- //
 DsoMem.prototype.create = function(entity){
-	var type = this._type;
+	var type = this._type;	
 
 	return new Promise(function(resolve, reject){
 

@@ -44,6 +44,8 @@ d.register("TodoMainView",{
 				var val = inputEl.value;
 				todoDso.create({subject: val}).then(function(){
 					inputEl.value = "";
+					// send to the notification
+					d.hub("notifHub").pub("notify", "info", "<strong>New task created:</strong> " + val);
 				});
 			}
 			//press tab, make editable the first item in the list
@@ -65,7 +67,11 @@ d.register("TodoMainView",{
 			var done = !entityRef.el.classList.contains("todo-done");
 
 			// we update the todo vas the dataservice API. 
-			todoDso.update(entityRef.id, {done:done});			
+			todoDso.update(entityRef.id, {done:done}).then(function(newEntity){
+				if (done){
+					d.hub("notifHub").pub("notify", "info", "<strong>Task done:</strong> " + newEntity.subject);	
+				}				
+			});			
 		}, 
 
 		// double clicking on a label makes it editable

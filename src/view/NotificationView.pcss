@@ -1,0 +1,82 @@
+@import "../pcss/utils.pcss";
+
+.NotificationView{
+	position: absolute; 
+	top: 56px;
+	right: -250px;
+	height: 400px;
+	width: 250px;
+	
+	z-index: 1000;
+	
+	/* Note: The container here allows us to encapsulate the notif-item full height (with margin and all) without doing js computation. 
+	*        Also it allows to reduce the height (which allows the vertical shrinking and progress layout) without forcing a relayout of the of the notif-item
+	*/
+	.notif-ctn{
+		
+		/* This transition property will be used just before deleting a closed notification to allow a smooth relayout of the eventual other notif below. */
+		transition: height .5s; 
+		
+		/* The draw out and back in animation 100% js */
+		animation: notif-keyframes 5s;
+		
+		/* This will be set in .js after the animation is completed to shrink back the notification to move up the eventual notification below */
+		&.hide{
+			height: 0px;
+		}
+
+		/* The notification item itself with its margin and layout rule. Because the animation and transition is on the container element above (.notif-ctn)
+			  we do not have to worry about animation/transition artifact. */
+		.notif-item{
+			@mixin elev-4;
+			transition: $trans-elev;	
+			
+			/* Just for fun, probably not a good UI pattern */
+			&:hover{
+				@mixin elev-24;
+			}
+
+			background: $color-prim-lightest;
+			position: relative;
+			min-height: 64px;
+			padding: 8px 13px;
+			margin-bottom: 16px;
+
+			&:after{
+				content: "";
+				position: absolute;
+				top: 0; left: 0; bottom: 0;
+				width: 5px;
+				background: $color-prim-light;
+			}
+
+			&.warning{
+				background: $color-warn-lightest;
+				&:after{
+					background: $color-warn-darkest;
+				}
+			}
+
+			&.error{
+				background: $color-error-lightest;
+				&:after{
+					background: $color-error-darkest;
+				}
+			}		
+		}		
+	}
+
+}
+
+/* The keyframe animation for the notif-ctn */
+@keyframes notif-keyframes{
+	0%{
+		transform: none;
+	}
+	20%,80%{
+		transform: translateX(-250px);
+	}
+	100%{
+		transform: translateX(0);
+	}
+}

@@ -1,6 +1,5 @@
 var d = mvdom; // external/global lib
 var render = require("../js-app/render.js").render;
-var utils = require("../js-app/utils.js");
 
 var pathToView = {
 	"": "HomeView", 
@@ -17,6 +16,8 @@ d.register("MainView",{
 
 	postDisplay: function(){
 		var view = this; // best practice, set the view variable first. 
+
+		d.display("NotificationView", view.el);
 	}, 
 
 	hubEvents: {

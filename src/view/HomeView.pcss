@@ -7,9 +7,12 @@
 	flex-direction: row;
 	
 	.home-card{
+		@mixin elev-anim;
+		@mixin elev-2;
+		&:hover{
+			@mixin elev-24;
+		}
 		padding: 16px 32px;
-		box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 
-								0 1px 5px 0 rgba(0,0,0,.12);
 								
 		background: #fff;							
 		margin: 16px; 
