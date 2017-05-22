@@ -45,7 +45,7 @@ d.register("TodoMainView",{
 				todoDso.create({subject: val}).then(function(){
 					inputEl.value = "";
 					// send to the notification
-					d.hub("notifHub").pub("notify", "info", "<strong>New task created:</strong> " + val);
+					d.hub("notifHub").pub("notify", {type: "info", content: "<strong>New task created:</strong> " + val});
 				});
 			}
 			//press tab, make editable the first item in the list
@@ -69,8 +69,10 @@ d.register("TodoMainView",{
 			// we update the todo vas the dataservice API. 
 			todoDso.update(entityRef.id, {done:done}).then(function(newEntity){
 				if (done){
-					d.hub("notifHub").pub("notify", "info", "<strong>Task done:</strong> " + newEntity.subject);	
-				}				
+					d.hub("notifHub").pub("notify", {type: "info", content: "<strong>Task done:</strong> " + newEntity.subject});
+				}else{
+					d.hub("notifHub").pub("notify", {type: "warning", content: "<strong>Task undone:</strong> " + newEntity.subject});
+				}			
 			});			
 		}, 
 

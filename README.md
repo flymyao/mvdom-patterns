@@ -32,6 +32,12 @@ npm run build
 npm start
 ```
 
+For development, you can watch & build source files with
+
+```
+npm run watch
+```
+
 [gulp-free build](https://github.com/mvdom/mvdom-patterns/wiki/gulp-free)
 
 ## What's in

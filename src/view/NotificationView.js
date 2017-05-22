@@ -14,20 +14,20 @@ d.register("NotificationView",{
 	hubEvents: {
 
 		// On topic notify on notifHub, we show the message. 
-		"notifHub; notify": function(message, evtInfo){
+		"notifHub; notify": function(notifMessage, evtInfo){
 			var view = this;
 			// For now, the scheme is to have the message being the content and the notification label be the event type
-			addItem.call(view,{type: evtInfo.label, content: message});
+			addItem.call(view,notifMessage);
 		}
 	}
 });
 
 
-function addItem(message){
+function addItem(notifMessage){
 	var view = this;
 
 	// create the new element 
-	var frag = render("NotificationView-item", message, true);
+	var frag = render("NotificationView-item", notifMessage, true);
 	// Make sure to get the firstEl before fragment is appended (appending a fragment empty its children)
 	var notifCtnEl = frag.firstElementChild;
 	view.el.append(frag);

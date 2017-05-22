@@ -9,8 +9,15 @@
 		display: flex;
 		flex-direction: column;	
 		flex: 1;
-		margin: 0px 16px;	
+		margin-right: 32px;
+		
+		/* Last element should stick to the container border */
+		&:last-child{
+			margin-right: 0px;
+		}
 	}
+
+
 	.summary{
 		height: 300px;
 		
@@ -53,10 +60,13 @@
 	}
 
 	.ui-card{
-		margin-right: 32px;
 		margin-bottom: 32px;	
+		
+		/* Last element should stick to the container border */
+		&:last-child{
+			margin-bottom: 0px;
+		}
 	}
-
 
 
 	/* --------- ui-table customization --------- */
