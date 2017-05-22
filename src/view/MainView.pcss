@@ -68,12 +68,25 @@
 			
 			a{
 				color: $txt-on-prim;
-				display: block;
+				display: flex;
 				padding: 8px;
 				text-decoration: none;
 				font-size: 18px;
 				margin-bottom: 16px;
+				align-items: center;
 				
+				i{					
+					width: 32px;
+					height: 32px;
+					fill: #555;
+				}
+
+				label{
+					margin-left: 18px;
+					display: block;
+					flex: 1;
+				}
+
 				&.active{
 					font-weight: bold;
 					background: $bkg-lightest;

@@ -105,7 +105,7 @@ routes.push({
 	method: 'GET',
 	path: baseURI + "/memUsage", 
 	handler: {
-		async: function(request, reply){
+		async: async function(request, reply){
 			touchLastRequested();
 			reply(memStats);
 		}

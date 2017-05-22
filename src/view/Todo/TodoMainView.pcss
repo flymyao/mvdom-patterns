@@ -18,8 +18,7 @@
 		width: 800px;
 		self-align: middle;
 		
-		box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 
-							0 25px 50px 0 rgba(0, 0, 0, 0.1);
+		@mixin elev-24;
 							
 		input.new-todo{
 			background: rgba(0, 0, 0, 0.003);
@@ -119,7 +118,7 @@
 
 		footer{
 			position: relative;
-			height: 32px;
+			height: 48px;
 			
 			font-size: 14px;
 			color: $txt-light;
@@ -133,7 +132,8 @@
 
 			.filter-bar{
 				@mixin fitparent;
-				padding-top: 6px;			
+				padding-top: 14px;
+				
 				text-align: center;
 
 				.filter{
@@ -147,7 +147,7 @@
 				}
 
 				.filter.active{
-					border: 1px solid rgba(175, 47, 47, 0.2)
+					border: 1px solid $color-prim-lighter;
 				}
 			}
 		}	/* footer */
