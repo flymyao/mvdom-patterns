@@ -6,13 +6,21 @@
 			<header>CPU</header>
 			<section class="content">
 				<div class="metric">
-					<div class="data"><span class="dx dx-user">...</span>%</div>
-					<label>USER</label>
-				</div>
+					<div class="svg-ctn">
+					</div>
 
-				<div class="metric">
-					<div class="data"><span class="dx dx-sys">...</span>%</div>
-					<label>SYS</label>
+					<div class="val primary user">
+						<span class="dx dx-user">...</span>%						
+					</div>
+
+					<div class="val sys">
+						<span class="dx dx-sys">...</span>%
+					</div>
+
+					<div class="legend">
+						<label class="user">User</label>
+						<label class="sys">Sys</label>
+					</div>
 				</div>				
 			</section>
 		</div>
@@ -44,14 +52,22 @@
 			<header>Memory</header>
 			<section class="content">
 				<div class="metric">
-					<div class="data"><span class="dx dx-used">...</span></div>
-					<label>USED</label>
-				</div>
+					<div class="svg-ctn">
+					</div>
 
-				<div class="metric">
-					<div class="data"><span class="dx dx-unused">...</span></div>
-					<label>UNUSED</label>
-				</div>					
+					<div class="val primary used">
+						<span class="dx dx-used">...</span>%						
+					</div>
+
+					<div class="val unused">
+						<span class="dx dx-unused">...</span>%
+					</div>
+
+					<div class="legend">
+						<label class="used">Used</label>
+						<label class="unused">Unused</label>
+					</div>
+				</div>				
 			</section>
 		</div>
 

@@ -1,5 +1,11 @@
 @import "../../pcss/utils.pcss";
 
+$metric-color-user: $color-prim;
+$metric-color-sys: $color-error;
+
+$metric-color-used: $color-prim;
+$metric-color-unused: $color-success;
+
 .DashMainView{
 	flex: 1;
 	display: flex;
@@ -29,28 +35,101 @@
 				margin: 0px 32px 0 0;
 				width: 150px;
 				height: 150px;
-				border-radius: 75px;
-				border: solid 1px $bdr;
 				display: flex;
 				flex-direction: column;
+				position: relative;
+				align-items: center;
+				justify-content: center;
 				
-				.data{
-					flex: 1;
-					font-size: 32px;
-					margin-top: 32px;
-					display: flex;
-					justify-content: center;
-					align-items: center;
+				.svg-ctn{
+					@mixin fit-parent;
 				}
 
-				label{
-					font-size: 18px;
+				.val{
+					font-size: 18px;					
+					margin: 0px;
+					margin-left: 0px;
+					width: 80px;
 					font-weight: 200;
-					padding: 4px 0;
-					height: 48px;
-					text-align: center;
-				}					
-			}
+					text-align: right;
+					
+					&.primary{
+						font-size: 24px;
+						font-weight: 600;
+						text-align: center;
+					}					
+					
+
+				}
+
+				.legend{
+					position: absolute;
+					top: 100%;
+					left: 0;
+					right: 0;
+					margin-top: 8px;
+					display: flex;
+					
+					label{
+						flex: 1;
+						display: block;
+						text-align: left;
+						position: relative;
+						margin-left: 24px;
+						
+						&:before{
+							content: "";
+							background-color: #ddd;
+							position: absolute;
+							top: 50%;					
+							left: -24px;
+							width: 16px;
+							margin-top: -8px;
+							height: 16px;
+						}						
+
+					}						
+				}
+
+				/* cpu colors */
+				.val.user{
+					color: $metric-color-user;
+				}
+
+				.val.sys{
+					color: $metric-color-sys;	
+				}
+
+				.legend label.user:before{
+					background-color: $metric-color-user;
+				}
+
+				.legend label.sys:before{
+					background-color: $metric-color-sys;
+				}				
+				/* /cpu colors */
+				
+
+				/* mem colors */
+				.val.used{
+					color: $metric-color-used;
+				}
+
+				.val.unused{
+					color: $metric-color-unused;	
+				}
+							
+				.legend label.used:before{
+					background-color: $metric-color-used;
+				}
+
+				.legend label.unused:before{
+					background-color: $metric-color-unused;
+				}				
+				/* /mem colors */
+
+		
+			} /* /.metric */
 			
 		}
 	}

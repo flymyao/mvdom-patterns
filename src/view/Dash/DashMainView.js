@@ -1,4 +1,6 @@
-var d = mvdom; // external/global lib
+var d = window.mvdom; // external/global lib
+var d3 = window.d3;
+
 var render = require("../../js-app/render.js").render;
 var ajax = require("../../js-app/ajax.js");
 var scheduler = require("../../js-app/scheduler.js");
@@ -12,6 +14,17 @@ d.register("DashMainView",{
 
 	postDisplay: function(){
 		var view = this; // best practice, set the view variable first. 
+
+		var cpuPieCtnEl = d.first(view.el, ".cpu-card .svg-ctn");
+		view._cpuPie = new UsagePie(["sys", "user", "idle"],["#F44336", "#2196F3" , "#d9d9d9"])
+										.init(cpuPieCtnEl)
+										.update({user: 0, sys: 0, idle: 100});
+
+
+		var memPieCtnEl = d.first(view.el, ".mem-card .svg-ctn");
+		view._memPie = new UsagePie(["used", "unused"],["#2196F3", "#4CAF50"])
+										.init(memPieCtnEl)
+										.update({used: 0, unused: 0});
 
 
 		// Add the first schedule with the direct scheduler.add 
@@ -27,6 +40,7 @@ d.register("DashMainView",{
 					return; // do nothing, next cycle we might have the data
 				}				
 				var lastMeasure = data[data.length - 1];
+				view._cpuPie.update(lastMeasure);
 				d.push(d.first(view.el, ".cpu-card.summary"), lastMeasure);				
 			}
 		});		
@@ -54,6 +68,7 @@ d.register("DashMainView",{
 					return; // do nothing, next cycle we might have the data
 				}
 				var lastMeasure = data[data.length - 1];
+				view._memPie.update(lastMeasure);
 				d.push(d.first(view.el, ".mem-card.summary"), {used: formatMb(lastMeasure.used),
 					unused: formatMb(lastMeasure.unused)});					
 			}
@@ -209,3 +224,114 @@ function sortBy(arr, keyNum, keyName){
 	});		
 }
 // --------- /Utils --------- //
+
+// --------- UsagePie--------- //
+function UsagePie(names, colors){
+	var self = this;
+
+
+	self._antiClockwise = {
+		startAngle: Math.PI * 2,
+		endAngle: Math.PI * 2
+	};
+
+	self._arcTweenIn = function arcTweenIn(a){
+		var i  = d3.interpolate(this._current, a);
+		this._current = i(0);
+		return function(t) {
+			return self._arc(i(t));
+		};
+	};
+
+	self._arcTweenOut = function arcTweenOut(a) {
+		var i = d3.interpolate(this._current, {startAngle: Math.PI * 2, endAngle: Math.PI * 2, value: 0});
+		this._current = i(0);
+		return function (t) {
+			return self._arc(i(t));
+		};
+	};
+
+	self._makeDataset = function(data){
+		var dataset = [];
+		names.forEach(function(name){
+			dataset.push({name: name, value: data[name]});
+		});
+
+		return dataset;
+	};
+
+	//self._color = d3.scaleOrdinal(d3.schemeCategory20b);	
+	self._color = d3.scaleOrdinal().domain(names).range(colors);
+}
+
+UsagePie.prototype.init = function(el){
+	var self = this;
+
+	var donutWidth = 20;
+
+	var width = el.clientHeight;
+	var height = width;
+	var radius = Math.min(width, height) / 2;
+
+	self._g = d3.select(el)
+		.append('svg')
+		.attr('width', width)
+		.attr('height', height)
+		.append('g')
+		.attr('transform', 'translate(' + (width / 2) +  ',' + (height / 2) + ')');
+
+	self._arc = d3.arc()
+		.innerRadius(radius - donutWidth)
+		.outerRadius(radius);
+
+	self._pie = d3.pie().value(function(d) {
+		return d.value; 
+	}).sort(null);		
+
+	return self;
+};
+
+
+UsagePie.prototype.update = function(data){
+	var self = this;
+
+	var dataset = self._makeDataset(data);
+
+	// SELECT EXISTING: This is the paths that exist already.
+	var paths = self._g.selectAll('path')
+								.data(this._pie(dataset));
+
+	// ENTER: create and initialize new elements when needed
+	var newPaths = paths.enter().append('path')
+		.attr('d', function(d){ 
+			return self._arc(self._antiClockwise);
+		})
+		.attr('fill', function(d, i) {
+			return self._color(d.data.name);
+		}).each(function(d){
+
+			this._current = {
+				data: d.data,
+				value: d.value,
+				startAngle: self._antiClockwise.startAngle,
+				endAngle: self._antiClockwise.endAngle
+			};
+		});
+
+
+	// ENTER + UPDATE: for both exsting and new paths, we set the transition
+	newPaths.merge(paths).transition().duration(750).attrTween("d", self._arcTweenIn);
+
+	// EXIT: remove the data
+	paths.exit()
+			.transition()
+			.duration(750)
+			.attrTween('d', self._arcTweenOut)	
+			.remove();
+
+	return self;
+};
+
+
+
+// --------- /UsagePie--------- //

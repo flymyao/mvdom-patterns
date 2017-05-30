@@ -7,7 +7,7 @@ var nsSeq = 0;
 
 // default options
 var defaultOpts = {
-	delay: 1 // delay in second
+	delay: 2 // delay in second
 };
 
 // Start with the default options

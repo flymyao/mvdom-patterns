@@ -5,7 +5,8 @@ var pathToView = {
 	"": "HomeView", 
 	"todo": "TodoMainView", 
 	"dash": "DashMainView", 
-	"postr": "PostrMainView"
+	"postr": "PostrMainView",
+	"sand": "SandboxView"
 };
 
 

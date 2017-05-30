@@ -1,6 +1,8 @@
-var d = mvdom; // external lib
+var d = window.mvdom;
+var Gtx = window.Gtx;
+var d3 = window.d3;
+
 var render = require("../js-app/render.js").render;
-var utils = require("../js-app/utils.js");
 
 
 d.register("HomeView",{
@@ -9,7 +11,7 @@ d.register("HomeView",{
 	}, 
 
 	postDisplay: function(){
-		var view = this; // best practice, set the view variable first. 
+		var view = this; // best practice, set the view variable first.		
 	}
 
 });
