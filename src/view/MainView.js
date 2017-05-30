@@ -6,7 +6,7 @@ var pathToView = {
 	"todo": "TodoMainView", 
 	"dash": "DashMainView", 
 	"postr": "PostrMainView",
-	"sand": "SandboxView"
+	"sand": "SandboxView" // this is accessible by hand in case the developer has src/view/Sandbox/ (not checked in)
 };
 
 
