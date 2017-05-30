@@ -18,13 +18,13 @@ d.register("DashMainView",{
 		var cpuPieCtnEl = d.first(view.el, ".cpu-card .svg-ctn");
 		view._cpuPie = new UsagePie(["sys", "user", "idle"],["#F44336", "#2196F3" , "#d9d9d9"])
 										.init(cpuPieCtnEl)
-										.update({user: 0, sys: 0, idle: 100});
+										.update({user: 50, sys: 50, idle: 50});
 
 
 		var memPieCtnEl = d.first(view.el, ".mem-card .svg-ctn");
 		view._memPie = new UsagePie(["used", "unused"],["#2196F3", "#4CAF50"])
 										.init(memPieCtnEl)
-										.update({used: 0, unused: 0});
+										.update({used: 50, unused: 50});
 
 
 		// Add the first schedule with the direct scheduler.add 
