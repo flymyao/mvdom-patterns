@@ -93,7 +93,7 @@ function param(object) {
 			if (encodedString.length > 0) {
 				encodedString += '&';
 			}
-			encodedString += encodeURI(prop + '=' + object[prop]);
+			encodedString += prop + '=' + encodeURIComponent(object[prop]);
 		}
 	}
 	return encodedString;
