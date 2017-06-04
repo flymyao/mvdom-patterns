@@ -1,0 +1,47 @@
+@import "../../pcss/utils.pcss";
+
+.UsageChart{
+	
+	.line{
+		fill: none;
+		stroke-linejoin: round;
+		stroke-linecap: round;
+		stroke-width: 1.5;
+	}
+
+	.sys-line{
+		stroke: red;
+	}
+
+	.user-line{
+		stroke: steelblue;
+	}
+
+	.sys-area{
+		fill: rgba(255,200,200,.2);
+	}
+
+	.user-area{
+		fill: rgba(200,200,255,.2);
+	}
+
+	g.y.axis{
+		.domain{
+			stroke: $color-grey;
+		}
+		.y-label{
+			fill: $color-grey;
+		}
+		.tick {
+			text{
+				fill: $color-grey;
+			}
+		}
+
+		/* This will be to hide the 0 tick */
+		/*.tick:first-of-type{
+			display:none;
+		}		 */
+	}
+
+}

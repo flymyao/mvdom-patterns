@@ -5,6 +5,7 @@ var render = require("../../js-app/render.js").render;
 var ajax = require("../../js-app/ajax.js");
 var scheduler = require("../../js-app/scheduler.js");
 var utils = require("../../js-app/utils.js");
+var UsageChart = require("./UsageChart.js");
 
 // --------- View Controller --------- //
 d.register("DashMainView",{
@@ -15,11 +16,13 @@ d.register("DashMainView",{
 	postDisplay: function(){
 		var view = this; // best practice, set the view variable first. 
 
-		var cpuPieCtnEl = d.first(view.el, ".cpu-card .svg-ctn");
+		var cpuPieCtnEl = d.first(view.el, ".cpu-card .metric .svg-ctn");
 		view._cpuPie = new UsagePie(["sys", "user", "idle"],["#F44336", "#2196F3" , "#d9d9d9"])
 										.init(cpuPieCtnEl)
 										.update({user: 50, sys: 50, idle: 50});
 
+		var cpuChartCtnEl = d.first(view.el, ".cpu-card .cpu-chart-ctn");		
+		view._cpuChart = new UsageChart().init(cpuChartCtnEl, {xMax: 10, delay: 1900});
 
 		var memPieCtnEl = d.first(view.el, ".mem-card .svg-ctn");
 		view._memPie = new UsagePie(["used", "unused"],["#2196F3", "#4CAF50"])
@@ -27,23 +30,7 @@ d.register("DashMainView",{
 										.update({used: 50, unused: 50});
 
 
-		// Add the first schedule with the direct scheduler.add 
-		// Note 1: Here we add manually a schedule without a namespace, so, 
-		//         we need to store the ns automatically created to remove it on .destroy
-		// Important: The recommended way for view is to use the view.schedules below which is enabled by scheduler-hook.js.
-		view.scheduleNs = scheduler.add({
-			performFn: function(){
-				return ajax.get("/api/cpuUsage");
-			}, 
-			receiveFn: function(data){
-				if (data.length === 0){
-					return; // do nothing, next cycle we might have the data
-				}				
-				var lastMeasure = data[data.length - 1];
-				view._cpuPie.update(lastMeasure);
-				d.push(d.first(view.el, ".cpu-card.summary"), lastMeasure);				
-			}
-		});		
+	
 	},
 
 	destroy: function(){
@@ -107,8 +94,27 @@ d.register("DashMainView",{
 		}, 
 
 		// cpuUsage 
-		// (see postDisplay: for the sake of this code example, it is done the manual way, see postDisplay)
+		{
+			performFn: function(){
+				return ajax.get("/api/cpuUsage");
+			}, 
+			receiveFn: function(data){
+				var view = this;
+				if (data.length === 0){
+					return; // do nothing, next cycle we might have the data
+				}
 
+				// Update the chart
+				view._cpuChart.update(data);
+
+				// update the pie
+				var lastMeasure = data[data.length - 1];
+				view._cpuPie.update(lastMeasure);
+				d.push(d.first(view.el, ".cpu-card.summary"), lastMeasure);
+
+
+			}
+		},
 
 		// topCpu
 		{
@@ -125,7 +131,6 @@ d.register("DashMainView",{
 				if (items && items.length === 0){
 					return;
 				}
-
 
 				// mark the items changed if they did
 				markChanges(view.prevTopCpuProcsDic, items, "pid", "cpu");
