@@ -22,9 +22,10 @@ const webDir = path.join(baseDir, "web/");
 const jsDistDir = path.resolve(webDir, "js/");
 const cssDistDir = path.resolve(webDir, "css/");
 
-const jsSrcDirs = ["src/js-app/","src/view/","src/elem/"];
-const pcssSrcDirs = ["src/pcss/","src/view/","src/elem/"];
-const tmplSrcDirs = ["src/view/"];
+const jsSrcDirs = ["js-app/","view/","elem/"].map(name => path.join(srcDir, name));
+const pcssSrcDirs = ["pcss/","view/","elem/"].map(name => path.join(srcDir, name));
+const tmplSrcDirs = ["view/"].map(name => path.join(srcDir, name));
+
 
 // we route the command to the appropriate function
 router({_default, js, css, tmpl, watch}).route();
