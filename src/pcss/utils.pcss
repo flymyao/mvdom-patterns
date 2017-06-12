@@ -2,6 +2,14 @@
 @import "./elevation.pcss";
 
 
+/* --------- Responsive Mixins --------- */
+@define-mixin media-mobile{
+	@media screen and (max-width: 750px){
+		@mixin-content;
+	}
+}
+/* --------- /Responsive Mixins --------- */
+
 
 /* --------- Layout Mixins --------- */
 @define-mixin ripple{
@@ -31,11 +39,11 @@
 	}
 }
 
-
 @define-mixin fit-parent{
 	position: absolute;
 	top: 0; right: 0; bottom: 0; left: 0;
 }
+
 @define-mixin clearfix{
 	&:before,
 	&:after {
