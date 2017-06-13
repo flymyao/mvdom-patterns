@@ -2,9 +2,9 @@ var d = mvdom; // global lib dependency
 
 
 /**
- * InMemory (browser) implementatio nof the DataService ("ds"). 
+ * InMemory (browser) implementation of the DataService ("ds"). 
  * 
- * - Use this during initial development or proof of concepts that cannot have server persistance.
+ * - Use this during initial development or proof of concepts that cannot have server persistence.
  * 
  * - All APIs respect the "ds" async contract (return Promise) so that changing 
  * 		to the dsAjax.js would be completely transparent.
@@ -12,12 +12,15 @@ var d = mvdom; // global lib dependency
 
 // opts {filter, orderBy}: dso.all and ds.first take an extra parameters for the declarative filtering & orderBy
 //
-// 	- filters: 
+// 	- filter: (filter or [filter,..])
 //    {"completed": true, "projectId": 123}: completed == true && projectId == 123
 //    [{"stage;>": 1}, {"completed": true, projectId: 123 }]: stage > 1 || completed == true && projectId == 123
-//	- offset: 
+//
+//	- offset: The offset idx from which to return the list
+//
+//  - limit: The limit of elements returned in the list
 //    
-//  - orderBy:
+//  - orderBy: NOT IMPLEMENTED YET
 //    "title": order by title asc
 //    "!title": oder by title desc
 //    "projectId, !id" oder by projectId asc, id desc
@@ -175,7 +178,7 @@ var store = {
 			var item;
 
 			// get the eventual filters
-			var filters = (opts && opts.filters)?opts.filters:null;
+			var filters = (opts && opts.filter)?opts.filter:null;
 			if (filters){
 				// make sure it is an array of filter
 				filters = (filters instanceof Array)?filters:[filters];
