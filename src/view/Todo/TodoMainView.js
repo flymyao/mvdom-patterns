@@ -241,21 +241,21 @@ function refreshViewFromRoute(){
 // private: refrensh the todo list of items
 function refreshList(){
 	var view = this;
-	var filters = null;
+	var filter = null;
 	switch(view.show){
 	case "all":
 		// not filter
 		break;
 	case "active":
 		// done can be null/undefined or false
-		filters = [{done: null}, {done: false}];
+		filter = [{done: null}, {done: false}];
 		break;
 	case "completed":
-		filters = {done: true};
+		filter = {done: true};
 		break;
 	}
 
-	todoDso.list({filters: filters}).then(function(todos){
+	todoDso.list({filter: filter}).then(function(todos){
 		var html = render("TodoMainView-todo-items",{items:todos});
 		d.first(view.el,".items").innerHTML = html;
 	});	
