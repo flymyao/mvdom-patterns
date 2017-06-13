@@ -97,19 +97,21 @@ DsoMem.prototype.get = function(id){
 DsoMem.prototype.list = function(opts){
 	var type = this._type;
 
-	// TODO: need to add the filtering support
 	return new Promise(function(resolve, reject){
 		resolve(store.list(type, opts));	
 	});
 };
 
 DsoMem.prototype.first = function(opts){
-	var type = this.type;
-	// FIXME: need to implement
+	var type = this._type;
+
+	return new Promise(function(resolve, reject){
+		resolve(store.first(type,opts));
+	});
 };
 
 DsoMem.prototype.remove = function(id){
-	var type = this.type;
+	var type = this._type;
 
 	return new Promise(function(resolve, reject){
 		resolve(store.remove(type, id));
@@ -165,9 +167,9 @@ var store = {
 	}, 
 
 	first: function(type, opts){
-		var entity = null;
-
-		return entity;
+		opts = Object.assign({}, opts, {limit: 1});
+		var list = this.list(type,opts);
+		return (list && list.length > 0)?list[0]:null;
 	},
 
 	list: function(type, opts){
