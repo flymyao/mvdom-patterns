@@ -234,13 +234,12 @@ function sortBy(arr, keyNum, keyName){
 function UsagePie(names, colors){
 	var self = this;
 
-
 	self._antiClockwise = {
 		startAngle: Math.PI * 2,
 		endAngle: Math.PI * 2
 	};
 
-	self._arcTweenIn = function arcTweenIn(a){
+	self._arcTweenIn = function(a){
 		var i  = d3.interpolate(this._current, a);
 		this._current = i(0);
 		return function(t) {
@@ -248,7 +247,7 @@ function UsagePie(names, colors){
 		};
 	};
 
-	self._arcTweenOut = function arcTweenOut(a) {
+	self._arcTweenOut = function(a) {
 		var i = d3.interpolate(this._current, {startAngle: Math.PI * 2, endAngle: Math.PI * 2, value: 0});
 		this._current = i(0);
 		return function (t) {
@@ -314,7 +313,7 @@ UsagePie.prototype.update = function(data){
 		.attr('fill', function(d, i) {
 			return self._color(d.data.name);
 		}).each(function(d){
-
+			// store the data in this path element, which will be used in the tween interporlation
 			this._current = {
 				data: d.data,
 				value: d.value,
@@ -336,7 +335,5 @@ UsagePie.prototype.update = function(data){
 
 	return self;
 };
-
-
 
 // --------- /UsagePie--------- //
