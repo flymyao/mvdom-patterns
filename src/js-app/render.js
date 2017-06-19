@@ -1,3 +1,5 @@
+const d = window.mvdom;
+
 module.exports = {
 	render: render
 };
@@ -18,7 +20,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 
-function render(templateName, data, returnsFragment){
+// render a named handlebars template with data and return a document fragment
+function render(templateName, data){
 	var tmpl = Handlebars.templates[templateName];
 
 	// if not found, throw an error
@@ -27,20 +30,6 @@ function render(templateName, data, returnsFragment){
 	}
 
 	// call the function and return the result
-	var html = tmpl(data);
-
-	if (returnsFragment){
-		var template = document.createElement("template");
-		if (template.content){
-			template.innerHTML = html;
-			return template.content;
-		}
-		// for IE 11
-		else{
-			return document.createRange().createContextualFragment(html);
-		}
-	}else{
-		return html;
-	}
+	return d.frag(tmpl(data));
 }
 // --------- /Render --------- //

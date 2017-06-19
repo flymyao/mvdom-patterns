@@ -86,10 +86,8 @@ d.register("DashMainView",{
 				// sort by name
 				sortBy(items, "mem", "name");
 
-				var html = render("DashMainView-mem-trs", {items: data});
-
-				tbodyEl.innerHTML = html;
-
+				tbodyEl.innerHTML = "";
+				d.append(tbodyEl,render("DashMainView-mem-trs", {items: data}));
 			}
 		}, 
 
@@ -142,8 +140,9 @@ d.register("DashMainView",{
 				sortBy(items, "cpu", "name");				
 
 				// render and update the HTML table
-				var html = render("DashMainView-cpu-trs", {items: items});
-				tbodyEl.innerHTML = html;
+				tbodyEl.innerHTML = ""; // delete
+				d.append(tbodyEl,render("DashMainView-cpu-trs", {items: items}));
+				
 
 			}
 		}		
