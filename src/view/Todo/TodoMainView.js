@@ -256,8 +256,9 @@ function refreshList(){
 	}
 
 	todoDso.list({filter: filter}).then(function(todos){
-		var html = render("TodoMainView-todo-items",{items:todos});
-		d.first(view.el,".items").innerHTML = html;
+		var itemsEl = d.first(view.el,".items");
+		d.empty(itemsEl);
+		d.append(itemsEl,render("TodoMainView-todo-items",{items:todos}));
 	});	
 }
 // --------- /Private View Methods --------- //
