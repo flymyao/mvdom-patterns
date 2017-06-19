@@ -19,7 +19,7 @@
     "handlebars": "^4.0.10",
     "hapi": "^16.4.3",
     "inert": "^4.2.0",
-    "mvdom": "^0.4.0",
+    "mvdom": "^0.4.2",
     "os-top": "0.0.4"
   },
   "devDependencies": {
