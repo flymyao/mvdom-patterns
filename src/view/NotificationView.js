@@ -27,7 +27,7 @@ function addItem(notifMessage){
 	var view = this;
 
 	// create the new element 
-	var frag = render("NotificationView-item", notifMessage, true);
+	var frag = render("NotificationView-item", notifMessage);
 	
 	// Make sure to get the firstEl before fragment is appended (appending a fragment empty its children)
 	var notifCtnEl = frag.firstElementChild || frag.childNodes[0]; // for edge, .firstElementChild is not supported
