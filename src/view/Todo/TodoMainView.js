@@ -17,6 +17,7 @@ d.register("TodoMainView",{
 		var view = this; // best practice, set the view variable first. 
 
 
+		view.itemsEl = d.first(view.el,".items");
 		view.newTodoIpt = d.first(view.el, "header .new-todo");
 		view.newTodoIpt.focus();
 
@@ -256,9 +257,10 @@ function refreshList(){
 	}
 
 	todoDso.list({filter: filter}).then(function(todos){
-		var itemsEl = d.first(view.el,".items");
-		d.empty(itemsEl);
-		d.append(itemsEl,render("TodoMainView-todo-items",{items:todos}));
+		if (todos){
+			d.append(view.itemsEl,render("TodoMainView-todo-items",{items:todos}), "empty");			
+		}
+
 	});	
 }
 // --------- /Private View Methods --------- //
