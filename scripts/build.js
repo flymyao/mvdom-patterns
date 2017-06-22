@@ -176,12 +176,19 @@ async function browserifyFiles(entries, distFile){
 	});
 	
 	// wrap the async browserify bundle into a promise to make it "async" friendlier
-	return new Promise(function(resolve, fail){
+	return new Promise(function(resolve, reject){
+		var writableFs = fs.createWriteStream(distFile);
+		// resolve promise when file is written
+		writableFs.on("finish", () => resolve());		
+		// reject if we have a write error
+		writableFs.on("error", (ex) => reject(ex));		
+
 		b.bundle()
-			.on("error", function (err) { fail(err); })
-			.on("end", function(){ resolve(); })
+			// reject if we have a bundle error
+			.on("error", function (err) { reject(err); })		
+			// or continue the flow
 			.pipe(exorcist(mapFile))
-			.pipe(fs.createWriteStream(distFile));
+			.pipe(writableFs);
 	});	
 }
 // --------- /Utils --------- //
