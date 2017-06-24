@@ -1,5 +1,5 @@
 var d = mvdom; // external/global lib
-var render = require("../js-app/render.js").render;
+var render = require("js-app/render.js").render;
 
 
 d.register("NotificationView",{

@@ -15,7 +15,7 @@ const processors = [
 ];
 
 // Define the constant for this project (needs to be before the router...route())
-const baseDir = path.resolve(__dirname, "../");
+const baseDir = "./"; // here we assume we script will be run from the package.json dir
 const srcDir = path.join(baseDir, "src/");
 const webDir = path.join(baseDir, "web/");
 
@@ -167,22 +167,35 @@ async function browserifyFiles(entries, distFile){
 	console.log("browserify - " + distFile);
 
 	var mapFile = distFile + ".map";	
+	// make sure to delete both files if they exist.
 	await fs.unlinkFiles([distFile, mapFile]);
+
+	// The browserify basedir will be the srcDir
+	var basedir = srcDir;
+	// So we need to make all entries relative to the base dir
+	entries = entries.map(f => f.replace(basedir, "./"));
+	// Note: This basedir and paths: ["./"] is the way to support relative require("./...js") 
+	//       as well as basedir relative with require("js-app/ds.js") for example
 
 	var b = browserify({ 
 		entries,
 		entry: true, 
-		debug: true  
+		debug: true, 
+		basedir: srcDir,
+		paths: ["./"] // trick to now allow require("js-app/ds.js") as well as relative require("./SameDirComponent.js")
 	});
 	
 	// wrap the async browserify bundle into a promise to make it "async" friendlier
 	return new Promise(function(resolve, reject){
+
+		// we create the writable and register some event handler to resolve or reject his Promise
 		var writableFs = fs.createWriteStream(distFile);
 		// resolve promise when file is written
 		writableFs.on("finish", () => resolve());		
 		// reject if we have a write error
 		writableFs.on("error", (ex) => reject(ex));		
 
+		// star the browserify bundling
 		b.bundle()
 			// reject if we have a bundle error
 			.on("error", function (err) { reject(err); })		

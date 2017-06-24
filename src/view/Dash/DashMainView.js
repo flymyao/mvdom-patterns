@@ -1,10 +1,10 @@
 var d = window.mvdom; // external/global lib
 var d3 = window.d3;
 
-var render = require("../../js-app/render.js").render;
-var ajax = require("../../js-app/ajax.js");
-var scheduler = require("../../js-app/scheduler.js");
-var utils = require("../../js-app/utils.js");
+var render = require("js-app/render.js").render;
+var ajax = require("js-app/ajax.js");
+var scheduler = require("js-app/scheduler.js");
+var utils = require("js-app/utils.js");
 var UsageChart = require("./UsageChart.js");
 
 // --------- View Controller --------- //

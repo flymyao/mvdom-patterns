@@ -1,8 +1,8 @@
 var d = mvdom; // external/global lib
-var render = require("../../js-app/render.js").render;
-var utils = require("../../js-app/utils.js");
-var dso = require("../../js-app/ds.js").dso;
-var route = require("../../js-app/route.js");
+var render = require("js-app/render.js").render;
+var utils = require("js-app/utils.js");
+var dso = require("js-app/ds.js").dso;
+var route = require("js-app/route.js");
 
 var todoDso = dso("Todo");
 

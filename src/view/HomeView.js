@@ -2,7 +2,7 @@ var d = window.mvdom;
 var Gtx = window.Gtx;
 var d3 = window.d3;
 
-var render = require("../js-app/render.js").render;
+var render = require("js-app/render.js").render;
 
 
 d.register("HomeView",{
