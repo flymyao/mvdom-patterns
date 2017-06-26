@@ -15,9 +15,9 @@ const processors = [
 ];
 
 // Define the constant for this project (needs to be before the router...route())
-const baseDir = "./"; // here we assume we script will be run from the package.json dir
-const srcDir = path.join(baseDir, "src/");
-const webDir = path.join(baseDir, "web/");
+const rootDir = "./"; // here we assume we script will be run from the package.json dir
+const srcDir = path.join(rootDir, "src/");
+const webDir = path.join(rootDir, "web/");
 
 const jsDistDir = path.resolve(webDir, "js/");
 const cssDistDir = path.resolve(webDir, "css/");
@@ -181,7 +181,7 @@ async function browserifyFiles(entries, distFile){
 		entries,
 		entry: true, 
 		debug: true, 
-		basedir: srcDir,
+		basedir: basedir,
 		paths: ["./"] // trick to now allow require("js-app/ds.js") as well as relative require("./SameDirComponent.js")
 	});
 	
