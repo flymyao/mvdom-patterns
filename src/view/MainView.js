@@ -54,8 +54,9 @@ function displayView(routeInfo){
 			activeEl.classList.add("active");
 		}		
 
-		// chang ethe subview
+		// change the subview
 		var subViewName = pathToView[path0];
+		
 		// display the view (empty first)
 		var contentEl = d.first(view.el, ".main-content");
 		d.empty(contentEl);

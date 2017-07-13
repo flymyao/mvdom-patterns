@@ -19,23 +19,37 @@ const rootDir = "./"; // here we assume we script will be run from the package.j
 const srcDir = path.join(rootDir, "src/");
 const webDir = path.join(rootDir, "web/");
 
-const jsDistDir = path.resolve(webDir, "js/");
-const cssDistDir = path.resolve(webDir, "css/");
+const jsDistDir = path.join(webDir, "js/");
+const cssDistDir = path.join(webDir, "css/");
 
-const jsSrcDirs = ["js-app/","view/","elem/"].map(name => path.join(srcDir, name));
-const pcssSrcDirs = ["pcss/","view/","elem/"].map(name => path.join(srcDir, name));
-const tmplSrcDirs = ["view/"].map(name => path.join(srcDir, name));
+// function that returns the full name from the srcDir
+const sourceName = name => path.join(srcDir, name);
 
+// src dirs
+const jsSrcDirs = ["js-app/","view/","elem/"].map(sourceName);
+const pcssSrcDirs = ["pcss/","view/","elem/"].map(sourceName);
+const tmplSrcDirs = ["view/"].map(sourceName);
+
+//// test dirs
+// Note: The test js dirs are the concatination of the js files and test js files. This is because test js files will import app js file, and 
+//       having two different distribution files would create issues where some of those files will be loaded twice, and will have different context. 
+const testJsSrcDirs = jsSrcDirs.concat(["test/js","test/view"].map(sourceName));
+
+// Note: css and templates can be complete different files as the the only imports on the css side will be for utilities and therefore won't affect the global context.
+const testPcssSrcDirs = ["test/view/"].map(sourceName);
+const testTmplSrcDirs = ["test/view/"].map(sourceName);
 
 // we route the command to the appropriate function
-router({_default, js, css, tmpl, watch}).route();
+router({_default, js, css, testCss, tmpl, testTmpl, watch}).route();
 
 
 // --------- Command Functions --------- //
 async function _default(){
 	await js();
 	await css();
+	await testCss();	
 	await tmpl();
+	await testTmpl();
 }
 
 async function js(mode){
@@ -48,7 +62,16 @@ async function js(mode){
 
 	if (!mode || mode === "app"){
 		await browserifyFiles(await fs.listFiles(jsSrcDirs, ".js"), 
-													path.join(webDir, "js/app-bundle.js"));
+													path.join(webDir, "js/app-bundle.js"));	
+	}
+
+	// if app or test, then compile the app-and-test-bundle.js
+	if (!mode || mode === "app" || mode === "test"){
+		let files = await fs.listFiles(testJsSrcDirs, ".js");
+		// we remove the js-app/main.js file as the test/js/test-main.js will be the main file that load the test app.
+		files = files.filter(name => !name.endsWith("js-app/main.js"));
+		await browserifyFiles(files, 
+											path.join(webDir, "test/app-and-test-bundle.js"));	
 	}
 }
 
@@ -60,26 +83,22 @@ async function css(){
 
 }
 
+async function testCss(){
+	await pcssFiles(await fs.listFiles(testPcssSrcDirs, ".pcss"), 
+									path.join(webDir, "test/test-bundle.css"));		
+}
+
 async function tmpl(){
 	ensureDist();
 
-	var distFile = path.join(webDir, "js/templates.js");
-	await fs.unlinkFiles([distFile]);
+	await tmplFiles(await fs.listFiles(tmplSrcDirs,".tmpl"),
+									path.join(webDir, "js/templates.js"));
+}
 
-	console.log("template - " + distFile);
-
-	var files = await fs.listFiles(tmplSrcDirs, ".tmpl");
-
-	var templateContent = [];
-
-	for (let file of files){
-
-		let htmlTemplate = await fs.readFile(file, "utf8");
-		let template = await hbsPrecompile(file, htmlTemplate);
-		templateContent.push(template);
-	}
-
-	await fs.writeFile(distFile,templateContent.join("\n"),"utf8");
+async function testTmpl(){
+	let files = await fs.listFiles(testTmplSrcDirs,".tmpl");
+	await tmplFiles(files,
+									path.join(webDir, "test/test-templates.js"));	
 }
 
 
@@ -89,21 +108,23 @@ async function watch(){
 
 	// NOTE: here we do not need to do await (even if we could) as it is fine to not do them sequentially. 
 	
-	fs.watchDirs(["src/js-lib/"], ".js", (action, name) => {
-		js("lib");
-	});
+	fs.watchDirs(["src/js-lib/"], ".js", () => js("lib"));
 
-	fs.watchDirs(jsSrcDirs, ".js", (action, name) => {
-		js("app");
-	});	
+	// Note: if the src js file are updated, the js("app") will compile the web/app-bundle.js web/test/app-and-test-bundle.js
+	fs.watchDirs(jsSrcDirs, ".js", () => js("app"));	
 
-	fs.watchDirs(pcssSrcDirs, ".pcss", (action, name) => {
-		css();
-	});	
+	// Note: here we can optimize and just compile the web/test/app-and-test-bundle.js
+	fs.watchDirs(testJsSrcDirs, ".js", () => js("test"));	
 
-	fs.watchDirs(tmplSrcDirs, ".tmpl", (action, name) => {
-		tmpl();
-	});
+	fs.watchDirs(pcssSrcDirs, ".pcss", () => css());
+
+	fs.watchDirs(testPcssSrcDirs, ".pcss", () => testCss());	
+
+	fs.watchDirs(tmplSrcDirs, ".tmpl", () => tmpl());
+
+	fs.watchDirs(testTmplSrcDirs, ".tmpl", () => testTmpl());
+
+
 }
 // --------- /Command Functions --------- //
 
@@ -114,6 +135,26 @@ async function watch(){
 function ensureDist(){
 	fs.ensureDirSync(jsDistDir);
 	fs.ensureDirSync(cssDistDir);
+}
+
+
+async function tmplFiles(files, distFile){
+	
+
+	await fs.unlinkFiles([distFile]);
+
+	console.log("template - " + distFile);
+
+	var templateContent = [];
+
+	for (let file of files){
+
+		let htmlTemplate = await fs.readFile(file, "utf8");
+		let template = await hbsPrecompile(file, htmlTemplate);
+		templateContent.push(template);
+	}
+
+	await fs.writeFile(distFile,templateContent.join("\n"),"utf8");	
 }
 
 async function pcssFiles(entries, distFile){

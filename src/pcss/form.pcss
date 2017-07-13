@@ -30,7 +30,7 @@
 		
 		&:focus{
 			outline:none;
-			border-bottom:2px solid #5264AE; 
+			border-bottom: 2px solid #5264AE; 
 		}
 	}
 	/* --------- /input/textarea --------- */
@@ -50,6 +50,11 @@
 			left:5px;
 			top:10px;			
 			transition:0.2s ease all; 
+		}
+
+		.message{
+			min-height: 1.5em;
+			color: $color-grey-light;							
 		}
 
 		/* label active state */
@@ -91,6 +96,18 @@
 	.bar:after {
 		right:50%; 
 	}
-	/* --------- /bar --------- */	
+	/* --------- /bar --------- */
+	
+	/* --------- Error --------- */
+	.field.error{
+		.message{
+			color: red;
+		}
+
+		input, textarea{
+			border-bottom: 1px solid red;			
+		}
+	}
+	/* --------- /Error --------- */	
 
 }

@@ -33,3 +33,18 @@ function render(templateName, data){
 	return d.frag(tmpl(data));
 }
 // --------- /Render --------- //
+
+
+// --------- Render mvdom Hook --------- //
+// Use the mvdom hook mechanism to set the default create behavior for any view that does not have a .create method
+d.hook("willCreate", function(view){
+	if (!view.create){
+		view.create = defaultCreate;
+	}
+});
+
+function defaultCreate(data){
+	var view = this;
+	return render(view.name, data);
+}
+// --------- /Render mvdom Hook --------- //

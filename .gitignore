@@ -17,6 +17,8 @@ src/view/Sandbox/
 # prevent the output files to be checked in 
 web/js/*.js
 web/css/*.css
+web/test/*.js
+web/test/*.css
 
 # prevent the .map
 *.map
