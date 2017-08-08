@@ -23,6 +23,9 @@ web/test/*.css
 # prevent the .map
 *.map
 
+# Ignore .vscode
+.vscode/
+
 # Ignore Sublime Text files
 *.sublime-project
 *.sublime-workspace
