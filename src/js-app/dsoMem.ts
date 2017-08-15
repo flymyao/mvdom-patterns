@@ -1,5 +1,5 @@
-var d = mvdom; // global lib dependency
-
+import {mvdom as d} from "../lib";
+import {ajax} from "./ajax";
 
 /**
  * InMemory (browser) implementation of the DataService ("ds"). 
@@ -25,102 +25,96 @@ var d = mvdom; // global lib dependency
 //    "!title": oder by title desc
 //    "projectId, !id" oder by projectId asc, id desc
 
+export class DsoMem{
+	private _type: string;
 
-function DsoMem(type){
-	this._type = type;
+	constructor(type: string){
+		this._type = type;
+	}
+
+	create(entity: any){
+		var type = this._type;			
+		return new Promise(function(resolve, reject){
+			// get the next seq and put the new object
+			var id = store.nextSeq();
+			entity.id = id;
+			store.put(type, id, entity);
+	
+			// get the new entity from the store (will have the .id)
+			entity = store.get(type, id);
+	
+			// we resolve first, to allow the caller to do something before the event happen
+			resolve(entity);
+	
+			// we publish the dataservice event
+			d.hub("dataHub").pub(type,"create",entity);
+		});		
+	}
+
+	update(id: number, entity: any){
+		var type = this._type;		
+		return new Promise(function(resolve, reject){
+			var dbEntity = store.get(type, id);
+			if (dbEntity){
+				// make sure we do not change the .id (TODO: might want to throw an error if not match)
+				delete entity.id;
+	
+				// put the new entity properties in the dbEntity
+				Object.assign(dbEntity, entity);
+				store.put(type, id, dbEntity);
+	
+				// we resolve 
+				resolve(dbEntity);
+	
+				// we public the dataservice event
+				d.hub("dataHub").pub(type,"update", dbEntity);
+	
+			}else{
+				reject("Cannot update entity " + type + " because [" + id + "] not found");
+			}
+		});
+	}
+
+	get(id: number){
+		var type = this._type;
+	
+		return new Promise(function(resolve, reject){
+			var dbEntity = store.get(type, id);
+			if (dbEntity){
+				resolve(dbEntity);
+			}else{
+				reject("Entity " + type + " with id [" + id + "] not found");
+			}
+		});
+	};
+	
+	list(opts: any){
+		var type = this._type;
+	
+		return new Promise(function(resolve, reject){
+			resolve(store.list(type, opts));	
+		});
+	};
+	
+	first(opts: any){
+		var type = this._type;
+	
+		return new Promise(function(resolve, reject){
+			resolve(store.first(type,opts));
+		});
+	};
+	
+	remove(id: any){
+		var type = this._type;
+	
+		return new Promise(function(resolve, reject){
+			resolve(store.remove(type, id));	
+			// we publish the dataservice event
+			d.hub("dataHub").pub(type,"delete",id);		
+		});
+	};
 }
 
-module.exports = DsoMem;
-
-
-// --------- DSO Apis --------- //
-DsoMem.prototype.create = function(entity){
-	var type = this._type;	
-
-	return new Promise(function(resolve, reject){
-
-		// get the next seq and put the new object
-		var id = store.nextSeq();
-		entity.id = id;
-		store.put(type, id, entity);
-
-		// get the new entity from the store (will have the .id)
-		entity = store.get(type, id);
-
-		// we resolve first, to allow the caller to do something before the event happen
-		resolve(entity);
-
-		// we publish the dataservice event
-		d.hub("dataHub").pub(type,"create",entity);
-	});
-};
-
-
-DsoMem.prototype.update = function(id, entity){
-	var type = this._type;
-
-	return new Promise(function(resolve, reject){
-		var dbEntity = store.get(type, id);
-		if (dbEntity){
-			// make sure we do not change the .id (TODO: might want to throw an error if not match)
-			delete entity.id;
-
-			// put the new entity properties in the dbEntity
-			Object.assign(dbEntity, entity);
-			store.put(type, id, dbEntity);
-
-			// we resolve 
-			resolve(dbEntity);
-
-			// we public the dataservice event
-			d.hub("dataHub").pub(type,"update", dbEntity);
-
-		}else{
-			reject("Cannot update entity " + type + " because [" + id + "] not found");
-		}
-	});
-};
-
-DsoMem.prototype.get = function(id){
-	var type = this._type;
-
-	return new Promise(function(resolve, reject){
-		var dbEntity = store.get(type, id);
-		if (dbEntity){
-			resolve(dbEntity);
-		}else{
-			reject("Entity " + type + " with id [" + id + "] not found");
-		}
-	});
-};
-
-DsoMem.prototype.list = function(opts){
-	var type = this._type;
-
-	return new Promise(function(resolve, reject){
-		resolve(store.list(type, opts));	
-	});
-};
-
-DsoMem.prototype.first = function(opts){
-	var type = this._type;
-
-	return new Promise(function(resolve, reject){
-		resolve(store.first(type,opts));
-	});
-};
-
-DsoMem.prototype.remove = function(id){
-	var type = this._type;
-
-	return new Promise(function(resolve, reject){
-		resolve(store.remove(type, id));
-
-		// we publish the dataservice event
-		d.hub("dataHub").pub(type,"delete",id);		
-	});
-};
-// --------- /DSO Apis --------- //
 
 
 // --------- Local Mock Store --------- //
@@ -129,7 +123,7 @@ DsoMem.prototype.remove = function(id){
 */
 
 // entityStores: Entity Store by entity type. Entity Store are {} of format {id : entity}
-var entityStores = {};
+var entityStores: {[name: string]: any} = {};
 
 var seq = 1; // global sequence
 
@@ -139,7 +133,7 @@ var store = {
 		return seq++;
 	},
 
-	get: function(type, id){
+	get: function(type: string, id: number){
 		var entityStore = entityStores[type];
 		var entity = (entityStore)?entityStore[id]:null;
 
@@ -147,7 +141,7 @@ var store = {
 		return (entity)?Object.assign({}, entity):null;
 	}, 
 
-	put: function(type, id, entity){
+	put: function(type: string, id: number, entity: any){
 		var entityStore = ensureObject(entityStores,type);
 		if (entityStore){
 			var dbEntity = Object.assign({}, entity);
@@ -157,22 +151,22 @@ var store = {
 		return false;
 	}, 
 
-	remove: function(type, id){
+	remove: function(type: string, id: number){
 		var entityStore = entityStores[type];
 		if (entityStore && entityStore[id]){
-			delete entityStore.delete(id);
+			delete entityStore[id];
 			return true;
 		}
 		return false;		
 	}, 
 
-	first: function(type, opts){
+	first: function(type: string, opts: any){
 		opts = Object.assign({}, opts, {limit: 1});
 		var list = this.list(type,opts);
 		return (list && list.length > 0)?list[0]:null;
 	},
 
-	list: function(type, opts){
+	list: function(type: string, opts: any){
 		var tmpList = [], list;
 		var entityStore = entityStores[type];		
 
@@ -226,7 +220,7 @@ var store = {
 
 
 
-function ensureObject(root, name){
+function ensureObject(root: any, name: string){
 	var obj = root[name];
 	if (!obj){
 		obj = new Map();
@@ -239,7 +233,7 @@ function ensureObject(root, name){
 var filterDefaultOp = "=";
 
 // Important: filters must be an array
-function passFilter(item, filters){
+function passFilter(item: any, filters: any){
 	
 	var pass;
 

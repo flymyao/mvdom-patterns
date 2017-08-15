@@ -11,6 +11,9 @@ tmp/
 # dev/ is where we put some developer peorsonal notes or data about this project
 dev/
 
+#
+out/
+
 # this is a personal developer sandbox. We do not commit it. 
 src/view/Sandbox/
 

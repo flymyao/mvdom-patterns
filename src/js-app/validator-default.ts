@@ -1,42 +1,39 @@
-var d = window.mvdom;
-
-var validator = require("./validator.js");
-
-
+import { mvdom as d } from "../lib";
+import { validator } from "./validator";
 
 // --------- Default Fail / Pass Hanlers --------- //
 // This default catcher will attempt to update the UI field element with the error information
-validator.fail(function(validationErrors){
+validator.fail((validationErrors) => {
 
-	validationErrors.forEach(function(validationError){
-		
+	validationErrors.forEach((validationError) => {
+
 		// debug for now
 		console.log("Error validating " + validationError.name + " " + validationError.ruleErrors[0].error);
 
-		var fieldEl = d.closest(validationError.el,".field");
-		if (fieldEl){
+		var fieldEl = d.closest(validationError.el, ".field");
+		if (fieldEl) {
 			fieldEl.classList.add("error");
 			var messageEl = d.first(fieldEl, ".message");
-			if (messageEl){
-				messageEl.innerText = validationError.name + " " + validationError.ruleErrors[0].error;	
-			}else{
+			if (messageEl) {
+				messageEl.innerText = validationError.name + " " + validationError.ruleErrors[0].error;
+			} else {
 				console.log("validator.fail no message element found, log to console", validationError);
-			}			
+			}
 		}
 	});
 });
 
 
-validator.success(function(validationSuccesses){
+validator.success((validationSuccesses) => {
 
-	validationSuccesses.forEach(function(validationSuccess){
-		var fieldEl = d.closest(validationSuccess.el,".field");
-		if (fieldEl){
+	validationSuccesses.forEach((validationSuccess) => {
+		var fieldEl = d.closest(validationSuccess.el, ".field");
+		if (fieldEl) {
 			fieldEl.classList.remove("error");
 			var messageEl = d.first(fieldEl, ".message");
-			if (messageEl){
+			if (messageEl) {
 				messageEl.innerText = "";
-			}			
+			}
 		}
 	});
 });
@@ -47,43 +44,43 @@ validator.success(function(validationSuccesses){
 
 // --------- Default Rules --------- //
 // required
-validator.add("required",function(name, value, ruleOptions){
-	if (value == null || value.trim().length === 0){
+validator.add("required", (name, value, ruleOptions) => {
+	if (value == null || value.trim().length === 0) {
 		throw "is required, cannot be empty.";
 	}
 });
 
 // email
-validator.add("email", function(name, value, ruleOptions){
+validator.add("email", (name, value, ruleOptions) => {
 	// for now, just checking if there is a @
-	if (value != null && value.indexOf("@") === -1){
+	if (value != null && value.indexOf("@") === -1) {
 		throw "is not a valid email address.";
 	}
 });
 
 // noSpecialChar
 var rgxNoSpecialChar = /^[a-zA-Z0-9\s]*$/;
-validator.add("noSpecialChar", function(name, value, ruleOptions){
+validator.add("noSpecialChar", (name, value, ruleOptions) => {
 	// for now, just checking if there is a @
-	if (value != null && rgxNoSpecialChar.exec(value) === null){
+	if (value != null && rgxNoSpecialChar.exec(value) === null) {
 		throw "cannot have special characters.";
 	}
 });
 
-validator.add("min", function(name, value, ruleOptions){
+validator.add("min", (name, value, ruleOptions) => {
 	var minVal = extractArg1AsNum(ruleOptions);
 
 	// for now, just checking if there is a @
-	if (value != null && value.length < minVal){
+	if (value != null && value.length < minVal) {
 		throw "should have at least " + minVal + " characters.";
 	}
 });
 
-validator.add("max", function(name, value, ruleOptions){
+validator.add("max", (name, value, ruleOptions) => {
 	var maxVal = extractArg1AsNum(ruleOptions);
-	
+
 	// for now, just checking if there is a @
-	if (value != null && value.length > maxVal){
+	if (value != null && value.length > maxVal) {
 		throw "cannot have more than " + maxVal + " characters.";
 	}
 });
@@ -93,11 +90,11 @@ validator.add("max", function(name, value, ruleOptions){
 
 
 // --------- Utils --------- //
-function extractArg1AsNum(ruleOptions){
+function extractArg1AsNum(ruleOptions: any) {
 	var numVal;
-	if (!ruleOptions.args || ruleOptions.args.length < 1){
+	if (!ruleOptions.args || ruleOptions.args.length < 1) {
 		throw "" + ruleOptions.name + " rule invalid, does not have a argument. Make sure to put it min(12) for example.";
-	}else{
+	} else {
 		numVal = ruleOptions.args[0] * 1;
 	}
 	return numVal;

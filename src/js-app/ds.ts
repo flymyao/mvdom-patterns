@@ -1,3 +1,4 @@
+import { ajax } from "./ajax";
 
 // The 'ds' module is the DataService module which is the layer to access data. The pattern here is that, 
 // the first param is the object type, which allows to have a single access points to data and start with dynamic/generic
@@ -6,49 +7,41 @@
 // filter: {offset:0, limit: 300, cond, orderBy, }
 // cond: {"title": "exactmatch", "firstName;ilike":"%jen%", "age;>": 30}
 // orderBy: "lastName" or "!age" (age descending) or ["!age", "lastName"]
-
 // ds("Task").create()
-
 // ds.register("_fallback_",{create, update, remove, ...})
 // ds.register("Task",)
 
 // dso by name
-var dsoDic = {};
+var dsoDic: { [name: string]: any } = {};
+
+type DsoFallbackFn = (type: string) => any;
 
 // optional dso fallback factory
-var _dsoFallbackFn;
+var _dsoFallbackFn: DsoFallbackFn;
 
+export module ds {
+	export function register(type: string, dso: any) {
+		dsoDic[type] = dso;
+	}
 
-module.exports = {
-	dso: dsoFn,
-	register: register,
-	fallback: fallback
-};
+	export function fallback(dsoFallbackFn: DsoFallbackFn) {
+		_dsoFallbackFn = dsoFallbackFn;
+	}
+}
 
-
-// return a DSO for a given type
-function dsoFn(type){
+export function dso(type: string): any {
 	var dso = dsoDic[type];
 
 	// if no dso found, but we have a dsoFallback factory, then, we create it.
-	if (!dso && _dsoFallbackFn){
+	if (!dso && _dsoFallbackFn) {
 		dsoDic[type] = dso = _dsoFallbackFn(type);
 	}
 
 	// throw exception if still no dso
-	if (!dso){
-		throw new "No dso for type " + type;
+	if (!dso) {
+		throw new Error("No dso for type " + type);
 	}
 
 	return dso;
-
 }
 
-// register a dso for a given type
-function register(type, dso){
-	dsoDic[type] = dso;
-}
-
-function fallback(dsoFallbackFn){
-	_dsoFallbackFn = dsoFallbackFn;
-}
