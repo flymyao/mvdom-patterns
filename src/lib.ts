@@ -10,8 +10,11 @@ export import Handlebars = require("handlebars/runtime");
 export { Mvdom, ViewController, View } from "mvdom/types/Mvdom";
 
 // import and re-export the mvdom lib to match the ES7/Typescript export scheme
-import * as d from "mvdom";
-export let mvdom = d;
+export import mvdom = require("mvdom");
+// this is equivalent to: 
+// import * as d from "mvdom";
+// export let mvdom = d;
+
 
 // export the d3 js
 export import d3 = require("d3");

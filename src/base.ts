@@ -16,4 +16,7 @@ export class BaseView implements View {
 	el?: HTMLElement;
 }
 
+export function register<T extends BaseView>(target: {new(): T;} ){
+	mvdom.register(target);
+}
 

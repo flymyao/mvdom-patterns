@@ -1,4 +1,4 @@
-import { BaseView, mvdom as d } from "../base";
+import { BaseView, mvdom as d, register} from "../base";
 import { HomeView } from "./HomeView";
 
 var pathToView: { [name: string]: string | any } = {
@@ -9,6 +9,7 @@ var pathToView: { [name: string]: string | any } = {
 	"sand": "SandboxView" // this is accessible by hand in case the developer has src/view/Sandbox/ (not checked in)
 };
 
+@register
 class MainView extends BaseView {
 	path0?: string;
 
@@ -22,7 +23,6 @@ class MainView extends BaseView {
 		}
 	}
 }
-d.register(MainView);
 
 // --------- Private Methods --------- //
 

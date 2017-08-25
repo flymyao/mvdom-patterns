@@ -1,4 +1,4 @@
-import { mvdom as d, BaseView } from "../../base";
+import { mvdom as d, BaseView, register } from "../../base";
 import { guard, entityRef } from "../../js-app/utils";
 import { dso } from "../../js-app/ds";
 import { route } from "../../js-app/route";
@@ -6,6 +6,7 @@ import { render } from "../../js-app/render";
 
 var todoDso = dso("Todo");
 
+@register
 class TodoMainView extends BaseView {
 	itemsEl: HTMLElement;
 	newTodoIpt: HTMLElement;
@@ -140,9 +141,6 @@ class TodoMainView extends BaseView {
 		}
 	}
 }
-
-d.register(TodoMainView);
-
 
 // --------- Private View Methods --------- //
 // TODO: Needs to move to TypeScript class once MVDOM supports Class in Register. 

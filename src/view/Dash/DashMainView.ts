@@ -1,4 +1,4 @@
-import { mvdom as d, BaseView } from "../../base";
+import { mvdom as d, BaseView, register } from "../../base";
 import { ajax } from "../../js-app/ajax";
 import { render } from "../../js-app/render";
 import { scheduler } from "../../js-app/scheduler";
@@ -8,6 +8,7 @@ import { UsagePie } from "./UsagePie";
 
 
 // --------- View Controller --------- //
+@register
 class DashMainView extends BaseView{
 	private _cpuPie?: UsagePie;
 	private _memPie?: UsagePie;
@@ -150,8 +151,6 @@ class DashMainView extends BaseView{
 		}
 	]
 }
-
-d.register(DashMainView);
 // --------- /View Controller --------- //
 
 

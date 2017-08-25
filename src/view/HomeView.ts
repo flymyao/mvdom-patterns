@@ -1,7 +1,5 @@
-import { BaseView, mvdom as d } from "../base";
+import { BaseView, mvdom as d, register } from "../base";
 
-// Note: T
+@register
 export class HomeView extends BaseView {
 }
-
-d.register(HomeView);

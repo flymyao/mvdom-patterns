@@ -1,5 +1,5 @@
-import {mvdom as d} from "../lib";
-import {ajax} from "./ajax";
+import { mvdom as d } from "../lib";
+import { Dso, BaseEntity, Criteria } from "./ds";
 
 /**
  * InMemory (browser) implementation of the DataService ("ds"). 
@@ -10,107 +10,92 @@ import {ajax} from "./ajax";
  * 		to the dsAjax.js would be completely transparent.
  **/
 
-// opts {filter, orderBy}: dso.all and ds.first take an extra parameters for the declarative filtering & orderBy
-//
-// 	- filter: (filter or [filter,..])
-//    {"completed": true, "projectId": 123}: completed == true && projectId == 123
-//    [{"stage;>": 1}, {"completed": true, projectId: 123 }]: stage > 1 || completed == true && projectId == 123
-//
-//	- offset: The offset idx from which to return the list
-//
-//  - limit: The limit of elements returned in the list
-//    
-//  - orderBy: NOT IMPLEMENTED YET
-//    "title": order by title asc
-//    "!title": oder by title desc
-//    "projectId, !id" oder by projectId asc, id desc
-
-export class DsoMem{
+export class DsoMem<E extends BaseEntity> implements Dso<E>{
 	private _type: string;
 
-	constructor(type: string){
+	constructor(type: string) {
 		this._type = type;
 	}
 
-	create(entity: any){
-		var type = this._type;			
-		return new Promise(function(resolve, reject){
+	create(entity: E): Promise<E> {
+		var type = this._type;
+		return new Promise(function (resolve, reject) {
 			// get the next seq and put the new object
 			var id = store.nextSeq();
 			entity.id = id;
 			store.put(type, id, entity);
-	
+
 			// get the new entity from the store (will have the .id)
 			entity = store.get(type, id);
-	
+
 			// we resolve first, to allow the caller to do something before the event happen
 			resolve(entity);
-	
+
 			// we publish the dataservice event
-			d.hub("dataHub").pub(type,"create",entity);
-		});		
+			d.hub("dataHub").pub(type, "create", entity);
+		});
 	}
 
-	update(id: number, entity: any){
-		var type = this._type;		
-		return new Promise(function(resolve, reject){
+	update(id: number, entity: E): Promise<E> {
+		var type = this._type;
+		return new Promise(function (resolve, reject) {
 			var dbEntity = store.get(type, id);
-			if (dbEntity){
+			if (dbEntity) {
 				// make sure we do not change the .id (TODO: might want to throw an error if not match)
 				delete entity.id;
-	
+
 				// put the new entity properties in the dbEntity
 				Object.assign(dbEntity, entity);
 				store.put(type, id, dbEntity);
-	
+
 				// we resolve 
 				resolve(dbEntity);
-	
+
 				// we public the dataservice event
-				d.hub("dataHub").pub(type,"update", dbEntity);
-	
-			}else{
+				d.hub("dataHub").pub(type, "update", dbEntity);
+
+			} else {
 				reject("Cannot update entity " + type + " because [" + id + "] not found");
 			}
 		});
 	}
 
-	get(id: number){
+	get(id: number): Promise<E> {
 		var type = this._type;
-	
-		return new Promise(function(resolve, reject){
-			var dbEntity = store.get(type, id);
-			if (dbEntity){
+
+		return new Promise(function (resolve, reject) {
+			var dbEntity = store.get(type, id) as E;
+			if (dbEntity) {
 				resolve(dbEntity);
-			}else{
+			} else {
 				reject("Entity " + type + " with id [" + id + "] not found");
 			}
 		});
 	};
-	
-	list(opts: any){
+
+	list(criteria: Criteria): Promise<E[]> {
 		var type = this._type;
-	
-		return new Promise(function(resolve, reject){
-			resolve(store.list(type, opts));	
+
+		return new Promise(function (resolve, reject) {
+			resolve(store.list(type, criteria));
 		});
 	};
-	
-	first(opts: any){
+
+	first(criteria: Criteria): Promise<E | null> {
 		var type = this._type;
-	
-		return new Promise(function(resolve, reject){
-			resolve(store.first(type,opts));
+
+		return new Promise(function (resolve, reject) {
+			resolve(store.first(type, criteria));
 		});
 	};
-	
-	remove(id: any){
+
+	remove(id: number): Promise<boolean> {
 		var type = this._type;
-	
-		return new Promise(function(resolve, reject){
-			resolve(store.remove(type, id));	
+
+		return new Promise(function (resolve, reject) {
+			resolve(store.remove(type, id));
 			// we publish the dataservice event
-			d.hub("dataHub").pub(type,"delete",id);		
+			d.hub("dataHub").pub(type, "delete", id);
 		});
 	};
 }
@@ -123,71 +108,71 @@ export class DsoMem{
 */
 
 // entityStores: Entity Store by entity type. Entity Store are {} of format {id : entity}
-var entityStores: {[name: string]: any} = {};
+module store {
 
-var seq = 1; // global sequence
+	var entityStores: { [name: string]: any } = {};
 
-var store = {
+	var seq = 1; // global sequence
 
-	nextSeq: function(){
+	export function nextSeq() {
 		return seq++;
-	},
+	}
 
-	get: function(type: string, id: number){
+	export function get(type: string, id: number) {
 		var entityStore = entityStores[type];
-		var entity = (entityStore)?entityStore[id]:null;
+		var entity = (entityStore) ? entityStore[id] : null;
 
 		// make sure to return a copy (for now, shallow copy)
-		return (entity)?Object.assign({}, entity):null;
-	}, 
+		return (entity) ? Object.assign({}, entity) : null;
+	}
 
-	put: function(type: string, id: number, entity: any){
-		var entityStore = ensureObject(entityStores,type);
-		if (entityStore){
+	export function put(type: string, id: number, entity: any) {
+		var entityStore = ensureObject(entityStores, type);
+		if (entityStore) {
 			var dbEntity = Object.assign({}, entity);
-			entityStore[id] = dbEntity; 
+			entityStore[id] = dbEntity;
 			return true;
 		}
 		return false;
-	}, 
+	}
 
-	remove: function(type: string, id: number){
+	export function remove(type: string, id: number) {
 		var entityStore = entityStores[type];
-		if (entityStore && entityStore[id]){
+		if (entityStore && entityStore[id]) {
 			delete entityStore[id];
 			return true;
 		}
-		return false;		
-	}, 
+		return false;
+	}
 
-	first: function(type: string, opts: any){
-		opts = Object.assign({}, opts, {limit: 1});
-		var list = this.list(type,opts);
-		return (list && list.length > 0)?list[0]:null;
-	},
+	export function first(type: string, criteria: Criteria) {
+		criteria = Object.assign({}, criteria, { limit: 1 });
+		var ls = list(type, criteria);
+		return (ls && ls.length > 0) ? ls[0] : null;
+	}
 
-	list: function(type: string, opts: any){
+	export function list(type: string, criteria: Criteria) {
 		var tmpList = [], list;
-		var entityStore = entityStores[type];		
+		var entityStore = entityStores[type];
 
-		if (entityStore){
+		if (entityStore) {
 			var item;
 
 			// get the eventual filters
-			var filters = (opts && opts.filter)?opts.filter:null;
-			if (filters){
+			var filters = (criteria && criteria.filter) ? criteria.filter : null;
+			if (filters) {
 				// make sure it is an array of filter
-				filters = (filters instanceof Array)?filters:[filters];
+				filters = (filters instanceof Array) ? filters : [filters];
 			}
 
 
 			// first, we go through the store to build the first list
 			// NOTE: Here we do the filter here because we have to build the list anyway. 
 			//       If we had the list as storage, we will sort first, and then, filter
-			for (var k in entityStore){
+			for (var k in entityStore) {
 				item = entityStore[k];
 				// add it to the list if no filters or it passes the filters
-				if (!filters || passFilter(item, filters)){
+				if (!filters || passFilter(item, filters)) {
 					tmpList.push(item);
 				}
 			}
@@ -198,16 +183,16 @@ var store = {
 			// tmpList.sort...
 
 			// extract the eventual offset, limit from the opts, or set the default
-			var offset = (opts && opts.offset)?opts.offset:0;
-			var limit = (opts && opts.limit)?opts.limit:-1; // -1 means no limit
-			
+			var offset = (criteria && criteria.offset) ? criteria.offset : 0;
+			var limit = (criteria && criteria.limit) ? criteria.limit : -1; // -1 means no limit
+
 			// Set the "lastIndex + 1" for the for loop
-			var l = (limit !== -1)?(offset + limit):tmpList.length;
+			var l = (limit !== -1) ? (offset + limit) : tmpList.length;
 			// make sure the l is maxed out by the tmpList.length
-			l = (l > tmpList.length)?tmpList.length:l;
+			l = (l > tmpList.length) ? tmpList.length : l;
 
 			list = [];
-			for (var i = offset; i < l; i++){
+			for (var i = offset; i < l; i++) {
 				list.push(Object.assign({}, tmpList[i]));
 			}
 
@@ -220,9 +205,9 @@ var store = {
 
 
 
-function ensureObject(root: any, name: string){
+function ensureObject(root: any, name: string) {
 	var obj = root[name];
-	if (!obj){
+	if (!obj) {
 		obj = new Map();
 		root[name] = obj;
 	}
@@ -233,18 +218,18 @@ function ensureObject(root: any, name: string){
 var filterDefaultOp = "=";
 
 // Important: filters must be an array
-function passFilter(item: any, filters: any){
-	
+function passFilter(item: any, filters: any) {
+
 	var pass;
 
 	// each condition in a filter are OR, so, first match we can break out.
 	// A condition item is a js object, and each property is a AND
 	var i = 0, l = filters.length, cond, k, v, propName, op, itemV;
-	for (; i < l; i++){
+	for (; i < l; i++) {
 		pass = true;
 
 		cond = filters[i];
-		for (k in cond){
+		for (k in cond) {
 			// TODO: For now, just support the simple case where key is the property name
 			//       Will need to add support for the operator in the key name
 			propName = k;
@@ -257,26 +242,26 @@ function passFilter(item: any, filters: any){
 			itemV = item[propName];
 
 
-			switch(op){
-			case "=":
-				// special case if v is null (need to test undefined)
-				if (v === null){
-					pass = pass && (itemV == null);
-				}else{
-					pass = pass && (v === itemV);	
-				}
-				
-				break;				
+			switch (op) {
+				case "=":
+					// special case if v is null (need to test undefined)
+					if (v === null) {
+						pass = pass && (itemV == null);
+					} else {
+						pass = pass && (v === itemV);
+					}
+
+					break;
 			}
 
 			// if one fail, break at false, since within an object, we have AND
-			if (!pass){
+			if (!pass) {
 				break;
 			}
 		}
 
 		// if one of those condition pass, we can return true since within the top filter array we have OR.
-		if (pass){
+		if (pass) {
 			break;
 		}
 	}
