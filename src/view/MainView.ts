@@ -25,7 +25,6 @@ class MainView extends BaseView {
 }
 
 // --------- Private Methods --------- //
-
 function displayView(this: MainView, routeInfo: any) {
 	var view = this;
 
@@ -60,5 +59,4 @@ function displayView(this: MainView, routeInfo: any) {
 	}
 
 }
-
 // --------- /Private Methods --------- //

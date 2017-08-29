@@ -1,4 +1,4 @@
-// This module is mostly a re-export packaging for 3rd party libraries. 
+// This module is mostly a re-export for 3rd party libraries. This way the application code does not need to know how those libs get imported at the first place.
 // It is very important that all other .ts file import those libraries from this module and not directly. 
 // "re-packaging" allows application code to not have to worry about the intricacies of 3rd party libs, and simply import what needs in a standard ES/TS way. 
 
@@ -6,14 +6,11 @@
 //		So, we extended the global scope at "global.d.ts"
 export import Handlebars = require("handlebars/runtime");
 
-// we export the MVDOM types
-export { Mvdom, ViewController, View } from "mvdom/types/Mvdom";
-
 // import and re-export the mvdom lib to match the ES7/Typescript export scheme
 export import mvdom = require("mvdom");
-// this is equivalent to: 
-// import * as d from "mvdom";
-// export let mvdom = d;
+
+// we export the MVDOM types
+export { ViewController, View } from "mvdom/types/Mvdom";
 
 
 // export the d3 js
