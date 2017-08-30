@@ -1,22 +1,23 @@
-// This module is mostly a re-export for 3rd party libraries. This way the application code does not need to know how those libs get imported at the first place.
-// It is very important that all other .ts file import those libraries from this module and not directly. 
-// "re-packaging" allows application code to not have to worry about the intricacies of 3rd party libs, and simply import what needs in a standard ES/TS way. 
-
-// Somehow "handlebars/handlebars.runtime" is found by VSCode and tsc, but not by tsify/browserify. 
-//		So, we extended the global scope at "global.d.ts"
-export import Handlebars = require("handlebars/runtime");
-
-// import and re-export the mvdom lib to match the ES7/Typescript export scheme
-export import mvdom = require("mvdom");
-
-// we export the MVDOM types
-export { ViewController, View } from "mvdom/types/Mvdom";
+// This module is mostly a re-export for 3rd party global libraries. 
+// This way the application code does not need to know how those libs get imported at the first place.
+// Important: All other .ts file needs to import those library from this lib.ts.
 
 
-// export the d3 js
-export import d3 = require("d3");
+// Note: here we "require" the d3, handlebars, and mvdom just for the Type. 
+//       As we just export the variable from the global/window variable and use the module just for types
+//       none of those libraries will be re-imported (as it will be already package in the lib-bundle.js from the js-lib/index.ts)
+import _d3 = require("d3");
+import _handlebars = require("handlebars/runtime");
+import _mvdom = require("mvdom");
 
-// Put the handlebars in the global context and set the .templates for the compiled .tmpl
-// Note: we could do this in the init.ts, but here we are sure it is done as soon as someone import Handlebars
-(<any>window).Handlebars = Handlebars;
-Handlebars.templates = {};
+// We also export the Mvdom Type View so that we can create a base view.
+export {View} from "mvdom/types/Mvdom";
+
+// Again, this is just to allow to have consistent imports from application, and we can assume that the 
+// window.__libname__ will be loaded from the js-lib/index.js
+
+export let mvdom: typeof _mvdom = (<any>window).mvdom;
+
+export let Handlebars: typeof _handlebars = (<any>window).Handlebars;
+
+export let d3: typeof _d3 = (<any>window).d3;

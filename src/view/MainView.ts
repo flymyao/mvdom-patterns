@@ -1,6 +1,7 @@
 import { BaseView, mvdom as d, register} from "../base";
 import { HomeView } from "./HomeView";
 
+
 var pathToView: { [name: string]: string | any } = {
 	"": HomeView,
 	"todo": "TodoMainView",

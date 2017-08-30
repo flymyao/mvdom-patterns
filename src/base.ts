@@ -1,8 +1,7 @@
-// This module export the basic export needes for Views (mvdom, BaseView), could export more as needed. 
-// Note: This will "re-export" the module "mvdom" from "./lib", so that we keep lib.js the central packaging point for 3rd party libs.
-
+// This still use the "./lib" module to load the required library, making "./lib" the single point for external libraries.
 import { View, mvdom } from "./lib"
 
+// This module export the base class, and decorator for View app code. 
 export { mvdom };
 
 export class BaseView implements View {

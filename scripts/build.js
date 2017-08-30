@@ -41,23 +41,41 @@ const testPcssSrcDirs = ["test/view/"].map(sourceName);
 const testTmplSrcDirs = ["test/view/"].map(sourceName);
 
 // we route the command to the appropriate function
-router({ _default, js, css, testCss, tmpl, testTmpl, watch }).route();
+router({ _default, js, lib, css, testCss, tmpl, testTmpl, watch }).route();
 
 
 // --------- Command Functions --------- //
 async function _default() {
 	await js();
+	await lib();
 	await css();
-	//await testCss();
 	await tmpl();
+	//await testCss();
 	//await testTmpl();
 }
 
+/** Build the 3rd party libs */
+async function lib(){
+	var start = now();
+	ensureDist();
+
+	var dist = path.join(webDir, "js/lib-bundle.js");
+
+	var entries = ["src/js-lib/index.ts"];
+
+	await browserifyFiles(entries,
+		dist);
+
+	printLog("JS Lib Compilation", dist, start);	
+}
+
+
+/** Build the javascript application bundle */
 async function js() {
 	var start = now();
 	ensureDist();
 
-	var dist = path.join(webDir, "js/new-bundle.js");
+	var dist = path.join(webDir, "js/app-bundle.js");
 
 	var entries = await fs.listFiles(jsSrcDirs, ".ts");
 
@@ -216,7 +234,7 @@ async function browserifyFiles(entries, distFile) {
 		writableFs.on("error", (ex) => reject(ex));
 
 		// star the browserify bundling
-		b.plugin(tsify)
+		b.plugin(tsify, { strict: true })
 			.bundle()
 			// reject if we have a bundle error
 			.on("error", function (err) { reject(err); })
