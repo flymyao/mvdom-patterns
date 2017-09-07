@@ -1,3 +1,10 @@
+/**
+ * This is the 3rd party Library which will generate the web/lib-bundle.js to be loaded separaly than the web/app-bundle.js which is all other src/..*.ts files.
+ * 
+ * IMPORTANT: This file should NOT be imported in the app code, as this is designed to be bundled in the web/lib-bundle.js and put libraries in their respective global scope. 
+ * 
+ */
+
 // Somehow "handlebars/handlebars.runtime" is found by VSCode and tsc, but not by tsify/browserify. 
 //		So, we extended the global scope at "global.d.ts"
 import Handlebars = require("handlebars/runtime");
