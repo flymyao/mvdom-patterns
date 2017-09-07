@@ -21,7 +21,7 @@
     "handlebars": "^4.0.10",
     "hapi": "^16.5.2",
     "inert": "^4.2.1",
-    "mvdom": "^0.5.1",
+    "mvdom": "^0.5.2",
     "os-top": "0.0.4"
   },
   "devDependencies": {
