@@ -1,9 +1,10 @@
 /**
- * This is to be used by the application code to re-bundle the 3rd party libraries (most of them that have been put in the global scope by js-lib/index.ts), so that the 
- * app code does not have to know if those libs are global scope or reloaded in the context of the web/app-bundle.js (which they are)
+ * This is to be used by the application code to re-bundle the 3rd party libraries that are in the lib-bundle.js
+ * 
  * 
  * Important: 
- * 	- Below, we are just using the "typeof ..." of the external libraries that have been put in the global scope from the js-lib/index.ts and just use the global assignment.
+ * 	- Below, we are just using the "typeof ..." of the external libraries as must not reimport them as they
+ *    are already in the global scope (i.e., window)
  */
 
 
@@ -13,7 +14,7 @@
 //       none of those libraries will be re-imported (as it will be already package in the lib-bundle.js from the js-lib/index.ts)
 import _d3 = require("d3");
 import _handlebars = require("handlebars/runtime");
-import * as _mvdom from "mvdom";
+import _mvdom = require("mvdom");
 
 // We also export the Mvdom Type View so that we can create a base view.
 export { View } from "mvdom";

@@ -1,5 +1,19 @@
-import { BaseView, mvdom as d, register } from "../base";
+import { BaseView, mvdom as d } from "../base";
 
-@register
 export class HomeView extends BaseView {
+
+	postDisplay() {
+		// do some stuf with this.el
+	}
+}
+
+
+class Greeter {
+	greeting = "stranger";
+	constructor(message: string) {
+		this.greeting = message || this.greeting;
+	}
+	greet() {
+		return "Hello, " + this.greeting;
+	}
 }

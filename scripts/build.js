@@ -43,7 +43,6 @@ const testTmplSrcDirs = ["test/view/"].map(sourceName);
 // we route the command to the appropriate function
 router({ _default, js, lib, css, testCss, tmpl, testTmpl, watch }).route();
 
-
 // --------- Command Functions --------- //
 async function _default() {
 	await js();
@@ -55,18 +54,17 @@ async function _default() {
 }
 
 /** Build the 3rd party libs */
-async function lib(){
+async function lib() {
 	var start = now();
 	ensureDist();
 
 	var dist = path.join(webDir, "js/lib-bundle.js");
 
-	var entries = ["src/js-lib/index.ts"];
+	var entries = ["src/lib-bundle.js"];
 
-	await browserifyFiles(entries,
-		dist);
+	await browserifyFiles(entries, dist, false);
 
-	printLog("JS Lib Compilation", dist, start);	
+	printLog("JS Lib Compilation", dist, start);
 }
 
 
@@ -79,8 +77,7 @@ async function js() {
 
 	var entries = await fs.listFiles(jsSrcDirs, ".ts");
 
-	await browserifyFiles(entries,
-		dist);
+	await browserifyFiles(entries, dist);
 
 	printLog("JS Compilation", dist, start);
 }
@@ -90,8 +87,8 @@ async function css() {
 	ensureDist();
 
 	var dist = path.join(cssDistDir, "all-bundle.css");
-	await pcssFiles(await fs.listFiles(pcssSrcDirs, ".pcss"),dist);
-		
+	await pcssFiles(await fs.listFiles(pcssSrcDirs, ".pcss"), dist);
+
 	printLog("CSS Compilation", dist, start);
 }
 
@@ -107,9 +104,9 @@ async function tmpl() {
 	ensureDist();
 
 	var dist = path.join(webDir, "js/templates.js");
-	await tmplFiles(await fs.listFiles(tmplSrcDirs, ".tmpl"),dist);
+	await tmplFiles(await fs.listFiles(tmplSrcDirs, ".tmpl"), dist);
 
-	printLog("TMPL Compilation", dist, start);	
+	printLog("TMPL Compilation", dist, start);
 }
 
 async function testTmpl() {
@@ -117,8 +114,8 @@ async function testTmpl() {
 
 	var dist = path.join(webDir, "test/test-templates.js");
 	await tmplFiles(await fs.listFiles(testTmplSrcDirs, ".tmpl"), dist);
-	
-	printLog("TMPL Test Compilation", dist, start);		
+
+	printLog("TMPL Test Compilation", dist, start);
 }
 
 
@@ -211,7 +208,12 @@ async function pcssFiles(entries, distFile) {
 	await fs.writeFile(mapFile, pcssResult.map, "utf8");
 }
 
-async function browserifyFiles(entries, distFile) {
+
+/**
+ * Browserify a set of files into a distribution file. 
+ * By default, assume it is "ts" files, and add tsify (can be turned off)
+ */
+async function browserifyFiles(entries, distFile, ts = true) {
 
 	var mapFile = distFile + ".map";
 	// make sure to delete both files if they exist.
@@ -222,6 +224,10 @@ async function browserifyFiles(entries, distFile) {
 		entry: true,
 		debug: true
 	});
+
+	if (ts) {
+		b = b.plugin(tsify, { strict: true });
+	}
 
 	// wrap the async browserify bundle into a promise to make it "async" friendlier
 	return new Promise(function (resolve, reject) {
@@ -234,8 +240,7 @@ async function browserifyFiles(entries, distFile) {
 		writableFs.on("error", (ex) => reject(ex));
 
 		// star the browserify bundling
-		b.plugin(tsify, { strict: true })
-			.bundle()
+		b.bundle()
 			// reject if we have a bundle error
 			.on("error", function (err) { reject(err); })
 			.pipe(exorcist(mapFile))
@@ -244,13 +249,12 @@ async function browserifyFiles(entries, distFile) {
 }
 
 // return now in milliseconds using high precision
-function now(){
+function now() {
 	var hrTime = process.hrtime();
 	return hrTime[0] * 1000 + hrTime[1] / 1000000;
 }
 
-function printLog(txt, dist, start){
+function printLog(txt, dist, start) {
 	console.log(txt + " - " + dist + " - " + Math.round(now() - start) + "ms");
 }
-
 // --------- /Utils --------- //

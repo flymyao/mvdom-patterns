@@ -1,4 +1,4 @@
-import { mvdom as d, BaseView, register } from "../../base";
+import { mvdom as d, BaseView } from "../../base";
 import { ajax } from "../../js-app/ajax";
 import { render } from "../../js-app/render";
 import { scheduler } from "../../js-app/scheduler";
@@ -8,15 +8,14 @@ import { UsagePie } from "./UsagePie";
 
 
 // --------- View Controller --------- //
-@register
-class DashMainView extends BaseView{
+export class DashMainView extends BaseView {
 	private _cpuPie?: UsagePie;
 	private _memPie?: UsagePie;
 	private _cpuChart?: UsageChart;
 	private prevTopMemProcsDic: any;
 	private prevTopCpuProcsDic: any;
 
-	postDisplay(){
+	postDisplay() {
 		// display the CPU PieChart
 		var cpuPieCtnEl = d.first(this.el, ".cpu-card .metric .svg-ctn");
 		cpuPieCtnEl = guard(cpuPieCtnEl, "Cannot find container HTMLElement for '.cpu-card .metric .svg-ctn'");
@@ -37,10 +36,10 @@ class DashMainView extends BaseView{
 			.update({ used: 50, unused: 50 });
 	}
 
-	destroy () {
+	destroy() {
 		// For the manual scheduler, we must remove the schedule manually.
 		// scheduler.remove(this.scheduleNs);
-	}	
+	}
 
 	// RECOMMENDED: Here we add the other schedule the view.schedules way which is managed by the scheduler-hook.js. 
 	//              Those schedules will be added when the view get created and removed when the view is removed.

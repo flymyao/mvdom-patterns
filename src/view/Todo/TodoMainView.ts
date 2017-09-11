@@ -1,4 +1,4 @@
-import { mvdom as d, BaseView, register } from "../../base";
+import { mvdom as d, BaseView } from "../../base";
 import { guard, entityRef } from "../../js-app/utils";
 import { dso } from "../../js-app/ds";
 import { route } from "../../js-app/route";
@@ -6,8 +6,7 @@ import { render } from "../../js-app/render";
 
 var todoDso = dso("Todo");
 
-@register
-class TodoMainView extends BaseView {
+export class TodoMainView extends BaseView {
 	itemsEl: HTMLElement;
 	newTodoIpt: HTMLElement;
 	path1?: string;

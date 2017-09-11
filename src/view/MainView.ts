@@ -1,21 +1,25 @@
-import { BaseView, mvdom as d, register} from "../base";
+import { BaseView, mvdom as d } from "../base";
 import { HomeView } from "./HomeView";
+import { TodoMainView } from "./Todo/TodoMainView";
+import { DashMainView } from "./Dash/DashMainView";
+import { PostrMainView } from "./Postr/PostrMainView";
+import { NotificationView } from "./NotificationView";
 
+type BaseViewClass = { new(): BaseView; }
 
-var pathToView: { [name: string]: string | any } = {
+var pathToView: { [name: string]: BaseViewClass } = {
 	"": HomeView,
-	"todo": "TodoMainView",
-	"dash": "DashMainView",
-	"postr": "PostrMainView",
-	"sand": "SandboxView" // this is accessible by hand in case the developer has src/view/Sandbox/ (not checked in)
+	"todo": TodoMainView,
+	"dash": DashMainView,
+	"postr": PostrMainView
 };
 
-@register
-class MainView extends BaseView {
+
+export class MainView extends BaseView {
 	path0?: string;
 
 	postDisplay() {
-		d.display("NotificationView", this.el);
+		d.display(NotificationView, this.el);
 	}
 
 	hubEvents = {
@@ -37,7 +41,7 @@ function displayView(this: MainView, routeInfo: any) {
 	// We change the subView only if the path0 is different
 	if (view.path0 !== path0) {
 		// Remove the eventual active
-		for (let itemEl of d.all(view.el, ".main-nav a.active")){
+		for (let itemEl of d.all(view.el, ".main-nav a.active")) {
 			itemEl.classList.remove("active");
 		}
 
@@ -48,12 +52,12 @@ function displayView(this: MainView, routeInfo: any) {
 		}
 
 		// change the subview
-		var subViewName = pathToView[path0];
+		var subViewClass = pathToView[path0];
 
 		// display the view (empty first)
 		var contentEl = d.first(view.el, ".main-content");
 		d.empty(contentEl);
-		d.display(subViewName, contentEl);
+		d.display(subViewClass, contentEl);
 
 		// change the current path0
 		view.path0 = path0;

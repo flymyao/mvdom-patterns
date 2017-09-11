@@ -14,8 +14,3 @@ export class BaseView implements View {
 	/** The htmlElement created */
 	el?: HTMLElement;
 }
-
-export function register<T extends BaseView>(target: {new(): T;} ){
-	mvdom.register(target);
-}
-

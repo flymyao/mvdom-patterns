@@ -1,8 +1,7 @@
-import { mvdom as d, BaseView, register } from "../base";
+import { mvdom as d, BaseView } from "../base";
 import { render } from "../js-app/render";
 
-@register
-export class NotificationView extends BaseView{
+export class NotificationView extends BaseView {
 	postDisplay() {
 		var view = this; // best practice, set the view variable first. 
 	}
