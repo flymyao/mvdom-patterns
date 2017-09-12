@@ -7,13 +7,12 @@
  * 
  */
 
-// Put the handlebars in the global context 
+// Just need the handlebars/runtime
 window.Handlebars = require("handlebars/runtime");
 Handlebars.templates = {};
 
 window.mvdom = require("mvdom");
 
-// Export the d3 js
 window.d3 = require("d3");
 
 
