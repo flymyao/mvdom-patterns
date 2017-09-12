@@ -1,10 +1,7 @@
 /**
- * This is to be used by the application code to re-bundle the 3rd party libraries that are in the lib-bundle.js
+ * This is to be used by the application code to re-export the 3rd party libraries that were put in the global scope by /src/lib-bundle.js
+ * and assign their their appropriate type
  * 
- * 
- * Important: 
- * 	- Below, we are just using the "typeof ..." of the external libraries as must not reimport them as they
- *    are already in the global scope (i.e., window)
  */
 
 
