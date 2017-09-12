@@ -8,22 +8,15 @@
  */
 
 
-
-// Note: here we "require" the d3, handlebars, and mvdom just for the Type. 
-//       As we just export the variable from the global/window variable and use the module just for types
-//       none of those libraries will be re-imported (as it will be already package in the lib-bundle.js from the js-lib/index.ts)
+// Note: Just import them to get the "typeof ..." below, so that the app code can benefit from their types.
 import _d3 = require("d3");
 import _handlebars = require("handlebars/runtime");
 import _mvdom = require("mvdom");
 
-// We also export the Mvdom Type View so that we can create a base view.
+// Mvdom, allso to export those useful interface as well, and since MVDOM is a "require js module" we have to do that separately for now.
 export { View, AnyView } from "mvdom";
 
-// Again, this is just to allow to have consistent imports from application, and we can assume that the 
-// window.__libname__ will be loaded from the js-lib/index.js
-
+// Now we re-export the libraries that were put in the global scope by lib-bundle.js, but with their appropriate type.
 export let mvdom: typeof _mvdom = (<any>window).mvdom;
-
 export let Handlebars: typeof _handlebars = (<any>window).Handlebars;
-
 export let d3: typeof _d3 = (<any>window).d3;
