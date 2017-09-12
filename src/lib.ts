@@ -17,7 +17,7 @@ import _handlebars = require("handlebars/runtime");
 import _mvdom = require("mvdom");
 
 // We also export the Mvdom Type View so that we can create a base view.
-export { View } from "mvdom";
+export { View, AnyView } from "mvdom";
 
 // Again, this is just to allow to have consistent imports from application, and we can assume that the 
 // window.__libname__ will be loaded from the js-lib/index.js

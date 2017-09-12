@@ -1,12 +1,12 @@
-import { mvdom as d, View } from "../lib";
+import { mvdom as d, AnyView } from "../lib";
 import { scheduler } from "./scheduler"
 
 
-function schNs(view: View) {
+function schNs(view: AnyView) {
 	return "view_sch_ns_" + view.id;
 }
 
-d.hook("didCreate", function (view: View) {
+d.hook("didCreate", function (view: AnyView) {
 	var ns = schNs(view);
 
 	if (view.schedules) {
@@ -23,7 +23,7 @@ d.hook("didCreate", function (view: View) {
 	}
 });
 
-d.hook("willRemove", (view: View) => {
+d.hook("willRemove", (view: AnyView) => {
 	var ns = schNs(view);
 
 	if (view.schedules) {

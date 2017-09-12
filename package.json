@@ -21,7 +21,7 @@
     "handlebars": "^4.0.10",
     "hapi": "^16.5.2",
     "inert": "^4.2.1",
-    "mvdom": "file:../../__mvdom/mvdom_src",
+    "mvdom": "^0.5.3",
     "os-top": "0.0.4",
     "tracking": "^1.1.3"
   },
