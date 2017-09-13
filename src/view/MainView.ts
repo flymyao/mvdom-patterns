@@ -4,6 +4,7 @@ import { TodoMainView } from "./Todo/TodoMainView";
 import { DashMainView } from "./Dash/DashMainView";
 import { PostrMainView } from "./Postr/PostrMainView";
 import { NotificationView } from "./NotificationView";
+import { DialogDemoView } from "./Dialog/DialogDemoView";
 
 type BaseViewClass = { new(): BaseView; }
 
@@ -11,7 +12,8 @@ var pathToView: { [name: string]: BaseViewClass } = {
 	"": HomeView,
 	"todo": TodoMainView,
 	"dash": DashMainView,
-	"postr": PostrMainView
+	"postr": PostrMainView,
+	"dialog": DialogDemoView,
 };
 
 

@@ -28,17 +28,3 @@ document.addEventListener("DOMContentLoaded", function (event) {
 	Handlebars.partials = Handlebars.templates;
 });
 // --------- /Render --------- //
-
-
-// --------- Render mvdom Hook --------- //
-// Use the mvdom hook mechanism to set the default create behavior for any view that does not have a .create method
-d.hook("willCreate", function (view: View) {
-	if (!view.create) {
-		view.create = defaultCreate;
-	}
-});
-
-function defaultCreate(this: View, data?: any) {
-	return render(this.name, data);
-}
-// --------- /Render mvdom Hook --------- //

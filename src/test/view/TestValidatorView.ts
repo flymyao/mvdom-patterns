@@ -2,18 +2,18 @@ import { mvdom as d, View } from "../../lib";
 import { validator } from "../../js-app/validator";
 
 
-d.register("TestValidatorView", {
+// d.register("TestValidatorView", {
 
-	postDisplay: function () {
-		var view = this;
-	},
+// 	postDisplay: function () {
+// 		var view = this;
+// 	},
 
-	events: {
-		"click; .do-save": function () {
-			var view = this;
-			validator.validate(view.el!, ".form.form-1 .validate");
-		}
-	}
-});
+// 	events: {
+// 		"click; .do-save": function () {
+// 			var view = this;
+// 			validator.validate(view.el!, ".form.form-1 .validate");
+// 		}
+// 	}
+// });
 
 
