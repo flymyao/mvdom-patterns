@@ -19,7 +19,7 @@
     "@types/handlebars": "^4.0.35",
     "d3": "^4.10.2",
     "handlebars": "^4.0.10",
-    "hapi": "^16.5.2",
+    "hapi": "^16.6.0",
     "inert": "^4.2.1",
     "mvdom": "^0.5.3",
     "os-top": "0.0.4",
@@ -37,7 +37,7 @@
     "postcss-mixins": "^6.0.1",
     "postcss-nested": "^2.1.1",
     "postcss-simple-vars": "^4.0.0",
-    "tsify": "^3.0.1",
+    "tsify": "^3.0.3",
     "typescript": "^2.5.2"
   },
   "scripts": {
