@@ -1,4 +1,4 @@
-import { BaseView, mvdom as d } from "../base";
+import { BaseView } from "../base";
 
 export class HomeView extends BaseView {
 

@@ -1,4 +1,4 @@
-import { mvdom as d } from "../lib";
+import { all } from "mvdom";
 
 var _validators: { [ruleName: string]: ValidationFn } = {};
 
@@ -40,7 +40,7 @@ export module validator {
 
 	export function validate(el: HTMLElement, selector: string, opts?: ValidateOptions) {
 
-		let inputs = d.all(el, selector);
+		let inputs = all(el, selector);
 		let validationErrors: ValidationError[] = [];
 		let validationSuccesses: ValidationSuccess[] = [];
 

@@ -1,4 +1,4 @@
-import { mvdom as d, AnyView } from "../lib";
+import { AnyView, hook } from "mvdom";
 import { scheduler } from "./scheduler"
 
 
@@ -6,7 +6,7 @@ function schNs(view: AnyView) {
 	return "view_sch_ns_" + view.id;
 }
 
-d.hook("didCreate", function (view: AnyView) {
+hook("didCreate", function (view: AnyView) {
 	var ns = schNs(view);
 
 	if (view.schedules) {
@@ -19,11 +19,11 @@ d.hook("didCreate", function (view: AnyView) {
 			schedule.ctx = view;
 			scheduler.add(schedule);
 		}
-
 	}
+
 });
 
-d.hook("willRemove", (view: AnyView) => {
+hook("willRemove", (view: AnyView) => {
 	var ns = schNs(view);
 
 	if (view.schedules) {

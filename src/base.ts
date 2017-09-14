@@ -1,9 +1,6 @@
 // This still use the "./lib" module to load the required library, making "./lib" the single point for external libraries.
-import { View, mvdom } from "./lib"
-import { render } from "./js-app/render";
-
-// This module export the base class, and decorator for View app code. 
-export { mvdom };
+import { View } from "mvdom"
+import { render } from "./ts/render";
 
 export class BaseView implements View {
 	/** Unique id of the view. Used in namespace binding and such.  */

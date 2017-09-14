@@ -1,4 +1,4 @@
-import { Handlebars } from "../lib";
+import * as Handlebars from "handlebars";
 
 Handlebars.registerHelper("echo", function (cond: string, val: any) {
 	return (cond) ? val : "";

@@ -1,11 +1,16 @@
 const router = require("cmdrouter");
-const browserify = require("browserify");
 const path = require("path");
 const fs = require("fs-extra-plus");
-const exorcist = require("exorcist");
 const postcss = require("postcss");
 const hbsPrecompile = require("hbsp").precompile; // promise style
-const tsify = require("tsify");
+
+const rollup = require('rollup');
+const rollup_cjs = require('rollup-plugin-commonjs');
+const rollup_re = require('rollup-plugin-node-resolve');
+const rollup_ts = require('rollup-plugin-typescript2');
+// Latest rollup-plugin-multi does not work with latest rollup, but pull request worked (https://github.com/rollup/rollup-plugin-multi-entry/pull/23)
+// so, this is the temporary patched version
+const rollup_multi = require('./rollup-plugin-multi-entry-patched');
 
 const processors = [
 	require("postcss-import"),
@@ -27,25 +32,15 @@ const cssDistDir = path.join(webDir, "css/");
 const sourceName = name => path.join(srcDir, name);
 
 // src dirs
-const jsSrcDirs = ["js-app/", "view/", "elem/"].map(sourceName);
 const pcssSrcDirs = ["pcss/", "view/", "elem/"].map(sourceName);
 const tmplSrcDirs = ["view/"].map(sourceName);
 
-//// test dirs
-// Note: The test js dirs are the concatination of the js files and test js files. This is because test js files will import app js file, and 
-//       having two different distribution files would create issues where some of those files will be loaded twice, and will have different context. 
-const testJsSrcDirs = jsSrcDirs.concat(["test/js", "test/view"].map(sourceName));
-
-// Note: css and templates can be complete different files as the the only imports on the css side will be for utilities and therefore won't affect the global context.
-const testPcssSrcDirs = ["test/view/"].map(sourceName);
-const testTmplSrcDirs = ["test/view/"].map(sourceName);
-
 // we route the command to the appropriate function
-router({ _default, js, lib, css, testCss, tmpl, testTmpl, watch }).route();
+router({ _default, app, lib, css, tmpl, watch }).route();
 
 // --------- Command Functions --------- //
 async function _default() {
-	await js();
+	await app();
 	await lib();
 	await css();
 	await tmpl();
@@ -53,33 +48,33 @@ async function _default() {
 	//await testTmpl();
 }
 
-/** Build the 3rd party libs */
-async function lib() {
+async function app(){
 	var start = now();
 	ensureDist();
+	
+	var dist = path.join(webDir, "js/app-bundle.js");
+	var entries = await fs.listFiles("src/", ".ts");	
+	// var entries = await fs.listFiles(jsSrcDirs, ".ts");	
 
-	var dist = path.join(webDir, "js/lib-bundle.js");
+	await rollupFiles(entries, dist, {ts: true, globals: {
+		"d3": "window.d3",
+		"mvdom": "window.mvdom", 
+		"handlebars": "window.Handlebars"
+	}});
 
-	var entries = ["src/lib-bundle.js"];
-
-	await browserifyFiles(entries, dist, false);
-
-	printLog("JS Lib Compilation", dist, start);
+	await printLog("Rollup", dist, start);
 }
 
-
-/** Build the javascript application bundle */
-async function js() {
+async function lib(){
 	var start = now();
 	ensureDist();
+	
+	var dist = path.join(webDir, "js/lib-bundle.js");
+	var entries = ["src/lib-bundle.js"];	
 
-	var dist = path.join(webDir, "js/app-bundle.js");
+	await rollupFiles(entries, dist, {ts: false});
 
-	var entries = await fs.listFiles(jsSrcDirs, ".ts");
-
-	await browserifyFiles(entries, dist);
-
-	printLog("JS Compilation", dist, start);
+	await printLog("Rollup", dist, start);
 }
 
 async function css() {
@@ -89,14 +84,7 @@ async function css() {
 	var dist = path.join(cssDistDir, "all-bundle.css");
 	await pcssFiles(await fs.listFiles(pcssSrcDirs, ".pcss"), dist);
 
-	printLog("CSS Compilation", dist, start);
-}
-
-async function testCss() {
-	var start = now();
-	var dist = path.join(webDir, "test/test-bundle.css");
-	await pcssFiles(await fs.listFiles(testPcssSrcDirs, ".pcss"), dist);
-	printLog("CSS Test Compilation", dist, start);
+	await printLog("CSS Compilation", dist, start);
 }
 
 async function tmpl() {
@@ -106,16 +94,7 @@ async function tmpl() {
 	var dist = path.join(webDir, "js/templates.js");
 	await tmplFiles(await fs.listFiles(tmplSrcDirs, ".tmpl"), dist);
 
-	printLog("TMPL Compilation", dist, start);
-}
-
-async function testTmpl() {
-	var start = now();
-
-	var dist = path.join(webDir, "test/test-templates.js");
-	await tmplFiles(await fs.listFiles(testTmplSrcDirs, ".tmpl"), dist);
-
-	printLog("TMPL Test Compilation", dist, start);
+	await printLog("TMPL Compilation", dist, start);
 }
 
 
@@ -125,15 +104,12 @@ async function watch() {
 
 	// NOTE: here we do not need to do await (even if we could) as it is fine to not do them sequentially. 
 
-	fs.watchDirs(["src/"], ".ts", js);
+	fs.watchDirs(["src/"], ".ts", app);
 
 	fs.watchDirs(pcssSrcDirs, ".pcss", () => css());
 
-	//fs.watchDirs(testPcssSrcDirs, ".pcss", () => testCss());
-
 	fs.watchDirs(tmplSrcDirs, ".tmpl", () => tmpl());
 
-	//fs.watchDirs(testTmplSrcDirs, ".tmpl", () => testTmpl());
 }
 // --------- /Command Functions --------- //
 
@@ -209,43 +185,59 @@ async function pcssFiles(entries, distFile) {
 }
 
 
-/**
- * Browserify a set of files into a distribution file. 
- * By default, assume it is "ts" files, and add tsify (can be turned off)
- */
-async function browserifyFiles(entries, distFile, ts = true) {
+var defaultOpts = {
+	ts: true
+};
 
+/**
+ * 
+ * @param {*} entries 
+ * @param {*} distFile 
+ * @param {*} opts 
+ *    - ts?: boolean - (default true)
+ *    - globals?: {importName: globalName} - (default undefined) define the list of global names (assumed to be mapped to window._name_)
+ */
+async function rollupFiles(entries, distFile, opts) {
+	opts = Object.assign({}, defaultOpts, opts);
+
+	// delete the previous ouutput files
 	var mapFile = distFile + ".map";
-	// make sure to delete both files if they exist.
 	await fs.unlinkFiles([distFile, mapFile]);
 
-	var b = browserify({
-		entries,
-		entry: true,
-		debug: true
-	});
+	// set the default rollup input options
+	const inputOptions = {
+		input: entries, 
+		plugins: [rollup_multi(), rollup_cjs(), rollup_re()]
+	};
 
-	if (ts) {
-		b = b.plugin(tsify, { strict: true });
+	// set the default rollup output options
+	// make the name from file name "web/js/lib-bundle.js" : "lib_bundle"
+	var name = path.parse(distFile).name.replace(/\W+/g, "_");
+	const outputOptions = {
+		file: distFile,
+		format: 'iife',
+		name: name,
+		sourcemap: true,
+		sourcemapFile: mapFile
+	};
+
+	// if ts, then, we add the rollup_ts plugin
+	if (opts.ts){
+		inputOptions.plugins.push(rollup_ts());
 	}
 
-	// wrap the async browserify bundle into a promise to make it "async" friendlier
-	return new Promise(function (resolve, reject) {
+	// if we have some globals, we add them accordingly
+	if (opts.globals){
+		// for input, just set the external (clone to be safe(r))
+		inputOptions.external = Object.keys(opts.globals);
+		outputOptions.globals = opts.globals;
+	}
 
-		// we create the writable and register some event handler to resolve or reject his Promise
-		var writableFs = fs.createWriteStream(distFile);
-		// resolve promise when file is written
-		writableFs.on("finish", () => resolve());
-		// reject if we have a write error
-		writableFs.on("error", (ex) => reject(ex));
+	// bundle
+	const bundle = await rollup.rollup(inputOptions);
 
-		// star the browserify bundling
-		b.bundle()
-			// reject if we have a bundle error
-			.on("error", function (err) { reject(err); })
-			.pipe(exorcist(mapFile))
-			.pipe(writableFs);
-	});
+	// write
+	await bundle.write(outputOptions);
 }
 
 // return now in milliseconds using high precision
@@ -254,7 +246,10 @@ function now() {
 	return hrTime[0] * 1000 + hrTime[1] / 1000000;
 }
 
-function printLog(txt, dist, start) {
-	console.log(txt + " - " + dist + " - " + Math.round(now() - start) + "ms");
+async function printLog(txt, dist, start) {
+	var size = (await fs.stat(dist)).size;
+	size = Math.round(size / 1000.0);
+
+	console.log(txt + " - " + dist + " - " + Math.round(now() - start) + "ms - " + size + "kb" );
 }
 // --------- /Utils --------- //

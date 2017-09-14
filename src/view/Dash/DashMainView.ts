@@ -1,8 +1,9 @@
-import { mvdom as d, BaseView } from "../../base";
-import { ajax } from "../../js-app/ajax";
-import { render } from "../../js-app/render";
-import { scheduler } from "../../js-app/scheduler";
-import { dic, guard } from "../../js-app/utils";
+import { BaseView } from "../../base";
+import { first, append, push } from "mvdom";
+import { ajax } from "../../ts/ajax";
+import { render } from "../../ts/render";
+import { scheduler } from "../../ts/scheduler";
+import { dic, guard } from "../../ts/utils";
 import { UsageChart } from "./UsageChart";
 import { UsagePie } from "./UsagePie";
 
@@ -17,19 +18,19 @@ export class DashMainView extends BaseView {
 
 	postDisplay() {
 		// display the CPU PieChart
-		var cpuPieCtnEl = d.first(this.el, ".cpu-card .metric .svg-ctn");
+		var cpuPieCtnEl = first(this.el, ".cpu-card .metric .svg-ctn");
 		cpuPieCtnEl = guard(cpuPieCtnEl, "Cannot find container HTMLElement for '.cpu-card .metric .svg-ctn'");
 		this._cpuPie = new UsagePie(["sys", "user", "idle"], ["#F44336", "#2196F3", "#d9d9d9"])
 			.init(cpuPieCtnEl)
 			.update({ user: 50, sys: 50, idle: 50 });
 
 		// diplays the CPUC Chart (lines)
-		var cpuChartCtnEl = d.first(this.el, ".cpu-card .cpu-chart-ctn");
+		var cpuChartCtnEl = first(this.el, ".cpu-card .cpu-chart-ctn");
 		cpuChartCtnEl = guard(cpuChartCtnEl, "Cannot find container HTMLElement for '.cpu-card .cpu-chart-ctn'")
 		this._cpuChart = new UsageChart().init(cpuChartCtnEl, { xMax: 10, delay: 1900 });
 
 		// displays the Mem PieChart
-		var memPieCtnEl = d.first(this.el, ".mem-card .svg-ctn");
+		var memPieCtnEl = first(this.el, ".mem-card .svg-ctn");
 		memPieCtnEl = guard(memPieCtnEl, "Cannot find container HTMLElement for '.cpu-card .cpu-chart-ctn'")
 		this._memPie = new UsagePie(["used", "unused"], ["#2196F3", "#4CAF50"])
 			.init(memPieCtnEl)
@@ -57,9 +58,9 @@ export class DashMainView extends BaseView {
 				var lastMeasure = data[data.length - 1];
 				this._memPie!.update(lastMeasure);
 
-				let cEl = d.first(this.el, ".mem-card.summary");
+				let cEl = first(this.el, ".mem-card.summary");
 				cEl = guard(cEl, "can't find '.mem-card.summary'");
-				d.push(cEl, {
+				push(cEl, {
 					used: formatMb(lastMeasure.used),
 					unused: formatMb(lastMeasure.unused)
 				});
@@ -75,7 +76,7 @@ export class DashMainView extends BaseView {
 			// the performFn and receiveFn are added to the scheduler.js with this view instance as ctx (context)
 			receiveFn: (data: any) => {
 				var items = data;
-				var tbodyEl = d.first(this.el, ".mem-card .ui-tbody");
+				var tbodyEl = first(this.el, ".mem-card .ui-tbody");
 				tbodyEl = guard(tbodyEl, "cannot find '.mem-card .ui-tbody'");
 
 				// do nothing if empty data (still building it up on the server)
@@ -93,7 +94,7 @@ export class DashMainView extends BaseView {
 				sortBy(items, "mem", "name");
 
 				tbodyEl.innerHTML = "";
-				d.append(tbodyEl, render("DashMainView-mem-trs", { items: data }));
+				append(tbodyEl, render("DashMainView-mem-trs", { items: data }));
 			}
 		},
 
@@ -114,7 +115,7 @@ export class DashMainView extends BaseView {
 				// update the pie
 				var lastMeasure = data[data.length - 1];
 				this._cpuPie!.update(lastMeasure);
-				d.push(guard(d.first(this.el, ".cpu-card.summary"), "Cannot find '.cpu-card.summary'"), lastMeasure);
+				push(guard(first(this.el, ".cpu-card.summary"), "Cannot find '.cpu-card.summary'"), lastMeasure);
 			}
 		},
 
@@ -126,7 +127,7 @@ export class DashMainView extends BaseView {
 
 			receiveFn: (data: any) => {
 				var items = data;
-				var tbodyEl = d.first(this.el, ".cpu-card .ui-tbody");
+				var tbodyEl = first(this.el, ".cpu-card .ui-tbody");
 				tbodyEl = guard(tbodyEl, "cannot find '.cpu-card .ui-tbody'");
 
 				// do nothing if empty data (still building it up on the server)
@@ -145,7 +146,7 @@ export class DashMainView extends BaseView {
 
 				// render and update the HTML table
 				tbodyEl.innerHTML = ""; // delete
-				d.append(tbodyEl, render("DashMainView-cpu-trs", { items: items }));
+				append(tbodyEl, render("DashMainView-cpu-trs", { items: items }));
 			}
 		}
 	]

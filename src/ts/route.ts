@@ -1,8 +1,8 @@
-import { mvdom as d } from "../lib";
+import { hub, on } from "mvdom";
 import { asNum } from "./utils";
 
 // Global routeHub to trigger the events
-var routeHub = d.hub("routeHub");
+var routeHub = hub("routeHub");
 
 export module route {
 
@@ -37,7 +37,7 @@ class RouteInfo {
 }
 
 document.addEventListener("DOMContentLoaded", function (event) {
-	d.on(window, "hashchange", function () {
+	on(window, "hashchange", function () {
 		var r = route.getInfo();
 		triggerRouteChange(route.getInfo());
 	});
@@ -63,6 +63,6 @@ function parseHash(): RouteInfo {
 		paths = [];
 	}
 
-	return new RouteInfo( {paths} );
+	return new RouteInfo({ paths });
 }
 // --------- /utilities --------- //

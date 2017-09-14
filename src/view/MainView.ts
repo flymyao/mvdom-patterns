@@ -1,4 +1,5 @@
-import { BaseView, mvdom as d } from "../base";
+import { BaseView } from "../base";
+import { display, all, first, empty } from "mvdom";
 import { HomeView } from "./HomeView";
 import { TodoMainView } from "./Todo/TodoMainView";
 import { DashMainView } from "./Dash/DashMainView";
@@ -21,7 +22,7 @@ export class MainView extends BaseView {
 	path0?: string;
 
 	postDisplay() {
-		d.display(NotificationView, this.el);
+		display(NotificationView, this.el);
 	}
 
 	hubEvents = {
@@ -43,12 +44,12 @@ function displayView(this: MainView, routeInfo: any) {
 	// We change the subView only if the path0 is different
 	if (view.path0 !== path0) {
 		// Remove the eventual active
-		for (let itemEl of d.all(view.el, ".main-nav a.active")) {
+		for (let itemEl of all(view.el, ".main-nav a.active")) {
 			itemEl.classList.remove("active");
 		}
 
 		// activate the main-nav a link
-		var activeEl = d.first(view.el, ".main-nav a[href='#" + path0 + "']");
+		var activeEl = first(view.el, ".main-nav a[href='#" + path0 + "']");
 		if (activeEl) {
 			activeEl.classList.add("active");
 		}
@@ -57,9 +58,9 @@ function displayView(this: MainView, routeInfo: any) {
 		var subViewClass = pathToView[path0];
 
 		// display the view (empty first)
-		var contentEl = d.first(view.el, ".main-content");
-		d.empty(contentEl);
-		d.display(subViewClass, contentEl);
+		var contentEl = first(view.el, ".main-content");
+		empty(contentEl);
+		display(subViewClass, contentEl);
 
 		// change the current path0
 		view.path0 = path0;

@@ -1,4 +1,4 @@
-import { d3 } from "../../lib";
+import * as d3 from "d3";
 
 export class UsagePie {
 
@@ -20,15 +20,15 @@ export class UsagePie {
 			endAngle: Math.PI * 2
 		};
 
-		this._arcTweenIn = function(a: any) {
+		this._arcTweenIn = function (a: any) {
 			var i = d3.interpolate(this._current, a);
 			this._current = i(0);
-			return function(t: any) {
+			return function (t: any) {
 				return self._arc(i(t));
 			};
 		};
 
-		this._arcTweenOut = function(a: any) {
+		this._arcTweenOut = function (a: any) {
 			var i = d3.interpolate(this._current, { startAngle: Math.PI * 2, endAngle: Math.PI * 2, value: 0 });
 			this._current = i(0);
 			return (t: any) => {
@@ -36,7 +36,7 @@ export class UsagePie {
 			};
 		};
 
-		this._makeDataSet = function(data: any) {
+		this._makeDataSet = function (data: any) {
 			var dataset: any[] = [];
 			names.forEach(function (name) {
 				dataset.push({ name: name, value: data[name] });
@@ -83,12 +83,12 @@ export class UsagePie {
 
 		// ENTER: create and initialize new elements when needed
 		var newPaths = paths.enter().append('path')
-			.attr('d', function(d: any) {
+			.attr('d', function (d: any) {
 				return self._arc(self._antiClockwise);
 			})
 			.attr('fill', (d: any, i: any) => {
 				return self._color(d.data.name);
-			}).each(function(this: any, d: any) {
+			}).each(function (this: any, d: any) {
 				// store the data in this path element, which will be used in the tween interporlation
 				this._current = {
 					data: d.data,

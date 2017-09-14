@@ -1,4 +1,4 @@
-import { mvdom as d } from "../lib";
+import { hub } from "mvdom";
 import { Dso, BaseEntity, Criteria } from "./ds";
 
 /**
@@ -32,7 +32,7 @@ export class DsoMem<E extends BaseEntity> implements Dso<E>{
 			resolve(entity);
 
 			// we publish the dataservice event
-			d.hub("dataHub").pub(type, "create", entity);
+			hub("dataHub").pub(type, "create", entity);
 		});
 	}
 
@@ -52,7 +52,7 @@ export class DsoMem<E extends BaseEntity> implements Dso<E>{
 				resolve(dbEntity);
 
 				// we public the dataservice event
-				d.hub("dataHub").pub(type, "update", dbEntity);
+				hub("dataHub").pub(type, "update", dbEntity);
 
 			} else {
 				reject("Cannot update entity " + type + " because [" + id + "] not found");
@@ -95,7 +95,7 @@ export class DsoMem<E extends BaseEntity> implements Dso<E>{
 		return new Promise(function (resolve, reject) {
 			resolve(store.remove(type, id));
 			// we publish the dataservice event
-			d.hub("dataHub").pub(type, "delete", id);
+			hub("dataHub").pub(type, "delete", id);
 		});
 	};
 }

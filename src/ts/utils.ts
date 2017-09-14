@@ -1,4 +1,4 @@
-import { mvdom as d } from "../lib";
+import { closest } from "mvdom";
 
 
 export function guard<U>(val: U | null | undefined, message: string): U {
@@ -40,7 +40,7 @@ the reference of the entitye {id, type, el}
 export function entityRef(el: HTMLElement | EventTarget | null, type?: string) {
 	var selector = (type != null) ? ("[data-entity='" + type + "']") : "[data-entity]";
 
-	var entityEl = d.closest(<HTMLElement>el, selector);
+	var entityEl = closest(<HTMLElement>el, selector);
 	if (entityEl) {
 		var entity: { [name: string]: any } = {};
 		entity.el = entityEl;

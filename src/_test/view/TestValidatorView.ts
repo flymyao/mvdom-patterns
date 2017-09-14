@@ -1,5 +1,5 @@
-import { mvdom as d, View } from "../../lib";
-import { validator } from "../../js-app/validator";
+// import { mvdom as d, View } from "../../lib";
+import { validator } from "../../ts/validator";
 
 
 // d.register("TestValidatorView", {

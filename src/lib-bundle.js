@@ -1,18 +1,27 @@
 /**
  * This is where the 3rd party get imported and put in the global scope. 
  * 
- * This is not a .ts file and should not be used a import in the app code. 
+ * This will be processed individually by Rollup to `web/js/lib-bundle.js`
  * 
- * `src/lib.ts` is re-exporting and typing those modules for application use.
+ * Keep it .js to make it simple (no need to have type checking on this file)
  * 
  */
 
 // Just need the handlebars/runtime
-window.Handlebars = require("handlebars/runtime");
-Handlebars.templates = {};
+import Handlebars from "handlebars/runtime";
+window.Handlebars = Handlebars;
 
-window.mvdom = require("mvdom");
 
-window.d3 = require("d3");
+// make sure the Handlebar.templates exists (will be used by templates.js as template store)
+Handlebars.templates = Handlebars.template || {};
+// Make all templates partials (no reason why they should not)
+Handlebars.partials = Handlebars.templates;
+
+import mvdom from "mvdom";
+window.mvdom = mvdom;
+
+// Note: At some point, we might want to three shake this one, and have it local to app-bundle
+import * as d3 from "d3";
+window.d3 = d3;
 
 

@@ -1,4 +1,4 @@
-import { mvdom as d } from "../lib";
+import { empty, trigger, first } from "mvdom";
 import { ds } from "./ds";
 import { DsoMem } from "./dsoMem";
 import { ajax } from "./ajax"
@@ -28,7 +28,7 @@ var svgSymbolsPromise = ajax.get("/svg/sprite.svg", null, { contentType: "applic
 // --------- /Load svg icons --------- //	
 
 
-document.addEventListener("DOMContentLoaded", function (event) {	
+document.addEventListener("DOMContentLoaded", function (event) {
 	// we make sure the the ajax for the svg/sprites.svg returns
 	svgSymbolsPromise.then(function (xmlDoc) {
 		// add the symbols to the head (external linking works but has issues - styling, and caching -)
@@ -38,12 +38,12 @@ document.addEventListener("DOMContentLoaded", function (event) {
 			h.appendChild(firstChildElement);
 
 		//// We can display the MainView now
-		var bodyEl = d.first("body");
+		var bodyEl = first("body");
 		// first make sure we empty eventual body.
-		d.empty(bodyEl);
+		empty(bodyEl);
 
 		// trigger an event that the application has been loaded
-		d.trigger(document, "APP_LOADED");
+		trigger(document, "APP_LOADED");
 
 	});
 });

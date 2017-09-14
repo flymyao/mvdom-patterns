@@ -1,8 +1,9 @@
-import { mvdom as d, BaseView } from "../../base";
-import { guard, entityRef } from "../../js-app/utils";
-import { dso } from "../../js-app/ds";
-import { route } from "../../js-app/route";
-import { render } from "../../js-app/render";
+import { BaseView } from "../../base";
+import { hub, append, all, first, prev, next, pull } from "mvdom";
+import { guard, entityRef } from "../../ts/utils";
+import { dso } from "../../ts/ds";
+import { route } from "../../ts/route";
+import { render } from "../../ts/render";
 
 var todoDso = dso("Todo");
 
@@ -13,8 +14,8 @@ export class TodoMainView extends BaseView {
 	show?: string;
 
 	postDisplay() {
-		this.itemsEl = d.first(this.el, ".items")!;
-		this.newTodoIpt = d.first(this.el, "header .new-todo")!;
+		this.itemsEl = first(this.el, ".items")!;
+		this.newTodoIpt = first(this.el, "header .new-todo")!;
 		this.newTodoIpt.focus();
 
 		refreshViewFromRoute.call(this);
@@ -42,15 +43,15 @@ export class TodoMainView extends BaseView {
 					todoDso.create({ subject: val }).then(function () {
 						inputEl.value = "";
 						// send to the notification
-						d.hub("notifHub").pub("notify", { type: "info", content: "<strong>New task created:</strong> " + val });
+						hub("notifHub").pub("notify", { type: "info", content: "<strong>New task created:</strong> " + val });
 					});
 				} else {
-					d.hub("notifHub").pub("notify", { type: "error", content: "<strong>ERROR:</strong> An empty task is not a task." });
+					hub("notifHub").pub("notify", { type: "error", content: "<strong>ERROR:</strong> An empty task is not a task." });
 				}
 			}
 			//press tab, make editable the first item in the list
 			else if (evt.key === "Tab") {
-				var todoEntityRef = entityRef(d.first(this.el!, ".items .todo-item")!);
+				var todoEntityRef = entityRef(first(this.el!, ".items .todo-item")!);
 				if (todoEntityRef) {
 					editTodo.call(this, todoEntityRef);
 				}
@@ -70,9 +71,9 @@ export class TodoMainView extends BaseView {
 			// we update the todo vas the dataservice API. 
 			todoDso.update(eRef.id, { done: done }).then(function (newEntity: any) {
 				if (done) {
-					d.hub("notifHub").pub("notify", { type: "info", content: "<strong>Task done:</strong> " + newEntity.subject });
+					hub("notifHub").pub("notify", { type: "info", content: "<strong>Task done:</strong> " + newEntity.subject });
 				} else {
-					d.hub("notifHub").pub("notify", { type: "warning", content: "<strong>Task undone:</strong> " + newEntity.subject });
+					hub("notifHub").pub("notify", { type: "warning", content: "<strong>Task undone:</strong> " + newEntity.subject });
 				}
 			});
 		},
@@ -113,8 +114,8 @@ export class TodoMainView extends BaseView {
 
 				case "Tab":
 					commitEditing.call(view, eRef).then(() => {
-						var entityEl = d.first(view.el, s);
-						var siblingTodoEl = (evt.shiftKey) ? d.prev(entityEl, ".todo-item") : d.next(entityEl, ".todo-item");
+						var entityEl = first(view.el, s);
+						var siblingTodoEl = (evt.shiftKey) ? prev(entityEl, ".todo-item") : next(entityEl, ".todo-item");
 						if (siblingTodoEl) {
 							var siblingTodoRef = entityRef(siblingTodoEl, "Todo");
 							editTodo.call(this, siblingTodoRef);
@@ -150,7 +151,7 @@ function commitEditing(this: TodoMainView, entityRef: any) {
 
 	return new Promise((resolve, fail) => {
 		// Get the name/value of the elements marked by class="dx"
-		var data = d.pull(entityRef.el);
+		var data = pull(entityRef.el);
 
 		// if the newSubject (in the input) is different, then, we update.
 		if (data.subject !== data.newSubject) {
@@ -177,7 +178,7 @@ function cancelEditing(this: TodoMainView, entityRef: any) {
 		entityRef.el.classList.remove("editing");
 
 		// we can remove the input element
-		var inputEl = d.first(entityRef.el, "input");
+		var inputEl = first(entityRef.el, "input");
 		if (inputEl && inputEl.parentNode) {
 			inputEl.parentNode.removeChild(inputEl);
 		}
@@ -189,7 +190,7 @@ function cancelEditing(this: TodoMainView, entityRef: any) {
 function editTodo(this: TodoMainView, entityRef: any) {
 	var todoEl = entityRef.el;
 
-	var labelEl = d.first(todoEl, "label");
+	var labelEl = first(todoEl, "label");
 	labelEl = guard(labelEl, "Cannot find label tag for " + todoEl);
 
 	var currentSubject = labelEl.innerHTML;
@@ -201,7 +202,7 @@ function editTodo(this: TodoMainView, entityRef: any) {
 	todoEl.insertAdjacentHTML("beforeend", inputHTML);
 
 	// set the focus and selection on the input element
-	var inputEl = <HTMLInputElement>d.first(todoEl, "input");
+	var inputEl = <HTMLInputElement>first(todoEl, "input");
 	inputEl = guard(inputEl, "Cannot find label om[it] for " + todoEl);
 	inputEl.focus();
 	inputEl.setSelectionRange(0, inputEl.value.length);
@@ -220,12 +221,12 @@ function refreshViewFromRoute(this: TodoMainView) {
 	if (this.path1 !== path1) {
 		this.show = (path1) ? path1 : "all";
 
-		d.all(this.el, "footer .filter-bar .filter.active").forEach((filterEl) => {
+		all(this.el, "footer .filter-bar .filter.active").forEach((filterEl: any) => {
 			filterEl.classList.remove("active");
 		});
 
 		var href = (path1) ? '#todo/' + path1 : '#todo';
-		var toActiveEl = d.first(this.el, "footer .filter-bar .filter[href='" + href + "']");
+		var toActiveEl = first(this.el, "footer .filter-bar .filter[href='" + href + "']");
 		if (toActiveEl) {
 			toActiveEl.classList.add("active");
 		}
@@ -257,7 +258,7 @@ function refreshList(this: TodoMainView) {
 
 	todoDso.list({ filter: filter }).then((todos: any) => {
 		if (todos) {
-			d.append(this.itemsEl, render("TodoMainView-todo-items", { items: todos }), "empty");
+			append(this.itemsEl, render("TodoMainView-todo-items", { items: todos }), "empty");
 		}
 	});
 }

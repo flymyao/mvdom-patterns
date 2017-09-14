@@ -1,5 +1,6 @@
-import { mvdom as d, BaseView } from "../base";
-import { render } from "../js-app/render";
+import { BaseView } from "../base";
+import { on, remove } from "mvdom";
+import { render } from "../ts/render";
 
 export class NotificationView extends BaseView {
 	postDisplay() {
@@ -30,11 +31,11 @@ function addItem(this: NotificationView, notifMessage: any) {
 	notifCtnEl.style.height = notifCtnEl.offsetHeight + "px";
 
 	// when the animation end, start the remove process
-	d.on(notifCtnEl, "animationend", function (evt) {
+	on(notifCtnEl, "animationend", function (evt: any) {
 
 		// once we finish shrinking the div, we can remove it from the DOM
-		d.on(notifCtnEl, "transitionend", function (evt) {
-			d.remove(notifCtnEl);
+		on(notifCtnEl, "transitionend", function (evt: any) {
+			remove(notifCtnEl);
 		});
 
 		// we set the height to 0px so that it can shrink and moving the eventual other items below

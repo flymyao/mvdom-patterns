@@ -1,4 +1,4 @@
-import { mvdom as d } from "../lib";
+import { first, closest } from "mvdom";
 import { validator } from "./validator";
 
 // --------- Default Fail / Pass Hanlers --------- //
@@ -10,10 +10,10 @@ validator.fail((validationErrors) => {
 		// debug for now
 		console.log("Error validating " + validationError.name + " " + validationError.ruleErrors[0].error);
 
-		var fieldEl = d.closest(validationError.el, ".field");
+		var fieldEl = closest(validationError.el, ".field");
 		if (fieldEl) {
 			fieldEl.classList.add("error");
-			var messageEl = d.first(fieldEl, ".message");
+			var messageEl = first(fieldEl, ".message");
 			if (messageEl) {
 				messageEl.innerText = validationError.name + " " + validationError.ruleErrors[0].error;
 			} else {
@@ -27,10 +27,10 @@ validator.fail((validationErrors) => {
 validator.success((validationSuccesses) => {
 
 	validationSuccesses.forEach((validationSuccess) => {
-		var fieldEl = d.closest(validationSuccess.el, ".field");
+		var fieldEl = closest(validationSuccess.el, ".field");
 		if (fieldEl) {
 			fieldEl.classList.remove("error");
-			var messageEl = d.first(fieldEl, ".message");
+			var messageEl = first(fieldEl, ".message");
 			if (messageEl) {
 				messageEl.innerText = "";
 			}

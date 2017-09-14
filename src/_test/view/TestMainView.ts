@@ -1,6 +1,7 @@
-import { mvdom as d, BaseView} from "../../base";
+import { BaseView } from "../../base";
+import { all, first, display, empty } from "mvdom";
 
-export class TestMainView extends BaseView{
+export class TestMainView extends BaseView {
 	path0?: string;
 
 	hubEvents = {
@@ -10,7 +11,6 @@ export class TestMainView extends BaseView{
 	}
 }
 
-d.register(TestMainView);
 
 // --------- Private Methods --------- //
 
@@ -26,12 +26,12 @@ function displayView(this: TestMainView, routeInfo: any) {
 	// We change the subView only if the path0 is different
 	if (view.path0 !== path0) {
 		// Remove the eventual active
-		d.all(view.el, "nav.main a.active").forEach(function (itemEl) {
+		all(view.el, "nav.main a.active").forEach(function (itemEl: any) {
 			itemEl.classList.remove("active");
 		});
 
 		// activate the nav a link
-		let activeEl = d.first(view.el, "nav.main a[href='#" + path0 + "']");
+		let activeEl = first(view.el, "nav.main a[href='#" + path0 + "']");
 		if (activeEl) {
 			activeEl.classList.add("active");
 		}
@@ -41,13 +41,13 @@ function displayView(this: TestMainView, routeInfo: any) {
 
 		if (subViewName) {
 			// display the view (empty first)
-			var contentEl = d.first(view.el, "section.main");
-			d.display(subViewName, contentEl, null, "empty");
+			var contentEl = first(view.el, "section.main");
+			display(subViewName, contentEl, null, "empty");
 
 			// change the current path0
 			view.path0 = path0;
 		} else {
-			d.empty(d.first(view.el, "section.main"));
+			empty(first(view.el, "section.main"));
 		}
 
 

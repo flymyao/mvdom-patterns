@@ -1,15 +1,15 @@
-import {mvdom} from "../lib";
+import { on } from "mvdom";
 
 
-document.addEventListener("DOMContentLoaded", function(event) {
-	
-	mvdom.on(document, "click", ".switch", function(evt){
+document.addEventListener("DOMContentLoaded", function (event) {
+
+	on(document, "click", ".switch", function (evt: any) {
 		var switchEl = evt.selectTarget;
 		toggle(switchEl);
 	});
 
-	mvdom.on(document, "keyup", ".switch", function(evt){
-		if (evt.code === "Space"){
+	on(document, "keyup", ".switch", function (evt: any) {
+		if (evt.code === "Space") {
 			toggle(evt.selectTarget);
 		}
 	});
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 
-function toggle(switchEl: HTMLElement){
+function toggle(switchEl: HTMLElement) {
 	switchEl.classList.toggle("on");
 }
 
