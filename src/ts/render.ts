@@ -1,9 +1,9 @@
-import * as Handlebars from "handlebars";
+import { templates } from "handlebars";
 
 import { frag } from "mvdom";
 
 export function render(templateName: string, data?: any) {
-	var tmpl = Handlebars.templates[templateName];
+	var tmpl = templates[templateName];
 
 	// if not found, throw an error
 	if (!tmpl) {
