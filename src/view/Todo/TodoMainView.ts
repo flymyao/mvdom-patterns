@@ -1,4 +1,4 @@
-import { BaseView, assign } from "../../base";
+import { BaseView, assign, add } from "../../base";
 import { hub, append, all, first, prev, next, pull } from "mvdom";
 import { guard, entityRef } from "../../ts/utils";
 import { dso } from "../../ts/ds";
@@ -24,7 +24,7 @@ export class TodoMainView extends BaseView {
 	constructor() {
 		super();
 
-		// Note: This is the equivalent to constructor(){super(); Object.assign(this.events, ...)}
+		// --------- Events Binding --------- //
 		assign(this.events, {
 
 			// all input - we disable the default Tab UI event handling, as it will be custom
@@ -133,8 +133,10 @@ export class TodoMainView extends BaseView {
 			}
 			// --------- /todo-item UI Events --------- //
 		});
+		// --------- /Events Binding --------- //
 
-		assign(this.hubEvents, {
+		// --------- HubEvents Binding --------- //
+		add(this.hubEvents, {
 
 			"dataHub; Todo": (data: any, info: any) => {
 				refreshList.call(this);
@@ -144,6 +146,7 @@ export class TodoMainView extends BaseView {
 				refreshViewFromRoute.call(this);
 			}
 		});
+		// --------- /HubEvents Binding --------- //
 	}
 
 }

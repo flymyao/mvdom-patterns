@@ -17,8 +17,8 @@ export class BaseDialog extends BaseView {
 	constructor() {
 		super();
 
+		// --------- Events Bindings --------- //
 		assign(this.events, {
-
 			'click; .base-dialog > header': (evt: Event) => {
 				console.log('BaseDialog click header', evt);
 			},
@@ -26,7 +26,8 @@ export class BaseDialog extends BaseView {
 			'click; .do-close': () => {
 				this.doClose();
 			}
-		})
+		});
+		// --------- /Events Bindings --------- //
 	}
 
 

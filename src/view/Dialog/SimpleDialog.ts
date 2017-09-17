@@ -15,14 +15,15 @@ export class SimpleDialog extends BaseDialog {
 	constructor() {
 		super();
 
+		// --------- Events Binding --------- //
 		assign(this.events, {
 			'click; .base-dialog > header': () => {
 				console.log('SimpleDialog click header');
 			}
 		});
+		// --------- /Events Binding --------- //
 
 	}
-
 	// --------- /Controller --------- //
 
 	doClose() {

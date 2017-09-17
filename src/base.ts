@@ -15,9 +15,12 @@ export class BaseView implements View {
 	/** The htmlElement created */
 	el?: HTMLElement;
 
+	// Here we use the object type, as we do not want to have two same bindings for the same event in the same class hierarchy
 	events: EventBindings = {};
 
-	hubEvents: HubBindings = {};
+	// Here we use the array way, because, we want to allow subclass to also listen to the same hubEvents 
+	//   as the base class (might be useful in some circumstances)
+	hubEvents: HubBindings[] = [];
 
 	create(data?: any) {
 		return render(this.name, data);
@@ -27,3 +30,9 @@ export class BaseView implements View {
 export function assign<T>(target: T, source: T): T {
 	return Object.assign(target, source);
 }
+
+export function add<T>(target: T[], source: T): T[] {
+	target.push(source);
+	return target;
+}
+

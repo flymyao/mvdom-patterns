@@ -9,6 +9,7 @@ export class DialogDemoView extends BaseView {
 	constructor() {
 		super();
 
+		// --------- Events Binding --------- //
 		assign(this.events, {
 			"click; .show.basic": () => {
 				display(new BaseDialog(), first('body')!);
@@ -18,6 +19,7 @@ export class DialogDemoView extends BaseView {
 				display(new SimpleDialog(), first('body')!);
 			}
 		});
+		// --------- /Events Binding --------- //
 
 	}
 
