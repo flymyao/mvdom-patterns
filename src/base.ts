@@ -2,6 +2,9 @@
 import { View } from "mvdom"
 import { render } from "./ts/render";
 
+export type EventBindings = { [selector: string]: (evt?: Event) => void };
+export type HubBindings = { [selector: string]: (data?: any, info?: any) => void };
+
 export class BaseView implements View {
 	/** Unique id of the view. Used in namespace binding and such.  */
 	id: string;
@@ -12,7 +15,15 @@ export class BaseView implements View {
 	/** The htmlElement created */
 	el?: HTMLElement;
 
+	events: EventBindings = {};
+
+	hubEvents: HubBindings = {};
+
 	create(data?: any) {
 		return render(this.name, data);
 	}
+}
+
+export function assign<T>(target: T, source: T): T {
+	return Object.assign(target, source);
 }

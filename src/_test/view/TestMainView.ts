@@ -42,7 +42,7 @@ function displayView(this: TestMainView, routeInfo: any) {
 		if (subViewName) {
 			// display the view (empty first)
 			var contentEl = first(view.el, "section.main");
-			display(subViewName, contentEl, null, "empty");
+			display(subViewName, contentEl!, null, "empty");
 
 			// change the current path0
 			view.path0 = path0;

@@ -40,10 +40,10 @@ router({ _default, app, lib, css, tmpl, watch }).route();
 
 // --------- Command Functions --------- //
 async function _default() {
-	await app();
 	await lib();
-	await css();
+	await app();
 	await tmpl();
+	await css();
 	//await testCss();
 	//await testTmpl();
 }
@@ -55,12 +55,18 @@ async function app(){
 	var dist = path.join(webDir, "js/app-bundle.js");
 	var entries = await fs.listFiles("src/", ".ts");	
 	// var entries = await fs.listFiles(jsSrcDirs, ".ts");	
-
-	await rollupFiles(entries, dist, {ts: true, globals: {
-		"d3": "window.d3",
-		"mvdom": "window.mvdom", 
-		"handlebars": "window.Handlebars"
-	}});
+	try{
+		await rollupFiles(entries, dist, {ts: true, globals: {
+			"d3": "window.d3",
+			"mvdom": "window.mvdom", 
+			"handlebars": "window.Handlebars"
+		}});
+	}catch(ex){
+		console.log("BUILD ERROR - something when wrong on rollup\n\t" + ex);
+		console.log("Empty string was save to the app bundle");
+		console.log("Trying saving again...");
+		return;
+	}
 
 	await printLog("Rollup", dist, start);
 }
@@ -84,7 +90,7 @@ async function css() {
 	var dist = path.join(cssDistDir, "all-bundle.css");
 	await pcssFiles(await fs.listFiles(pcssSrcDirs, ".pcss"), dist);
 
-	await printLog("CSS Compilation", dist, start);
+	await printLog("postCSS", dist, start);
 }
 
 async function tmpl() {
@@ -94,7 +100,7 @@ async function tmpl() {
 	var dist = path.join(webDir, "js/templates.js");
 	await tmplFiles(await fs.listFiles(tmplSrcDirs, ".tmpl"), dist);
 
-	await printLog("TMPL Compilation", dist, start);
+	await printLog("Template", dist, start);
 }
 
 
@@ -104,7 +110,7 @@ async function watch() {
 
 	// NOTE: here we do not need to do await (even if we could) as it is fine to not do them sequentially. 
 
-	fs.watchDirs(["src/"], ".ts", app);
+	fs.watchDirs(["src/"], ".ts", () => app());
 
 	fs.watchDirs(pcssSrcDirs, ".pcss", () => css());
 
@@ -200,6 +206,8 @@ var defaultOpts = {
 async function rollupFiles(entries, distFile, opts) {
 	opts = Object.assign({}, defaultOpts, opts);
 
+	await fs.remove("./.rpt2_cache");
+
 	// delete the previous ouutput files
 	var mapFile = distFile + ".map";
 	await fs.unlinkFiles([distFile, mapFile]);
@@ -223,7 +231,8 @@ async function rollupFiles(entries, distFile, opts) {
 
 	// if ts, then, we add the rollup_ts plugin
 	if (opts.ts){
-		inputOptions.plugins.push(rollup_ts());
+		// Note: if we do not have clean:true, we get some exception when watch.
+		inputOptions.plugins.push(rollup_ts({clean: true}));
 	}
 
 	// if we have some globals, we add them accordingly
@@ -233,11 +242,20 @@ async function rollupFiles(entries, distFile, opts) {
 		outputOptions.globals = opts.globals;
 	}
 
-	// bundle
-	const bundle = await rollup.rollup(inputOptions);
+	try{
+		// bundle
+		const bundle = await rollup.rollup(inputOptions);
 
-	// write
-	await bundle.write(outputOptions);
+		// write
+		await bundle.write(outputOptions);
+
+		// make sure the .rpt2_cache/ folder is delete (apparently, clean:true does not work)
+		//await fs.remove("./.rpt2_cache");
+	}catch(ex){
+		// make sure we write nothing in the file, to know nothing got compiled
+		await fs.writeFile(distFile, "", "utf8");
+		throw ex;
+	}
 }
 
 // return now in milliseconds using high precision

@@ -14,7 +14,7 @@ var pathToView: { [name: string]: BaseViewClass } = {
 	"todo": TodoMainView,
 	"dash": DashMainView,
 	"postr": PostrMainView,
-	"dialog": DialogDemoView,
+	"dialog": DialogDemoView
 };
 
 
@@ -22,7 +22,7 @@ export class MainView extends BaseView {
 	path0?: string;
 
 	postDisplay() {
-		display(NotificationView, this.el);
+		display(NotificationView, this.el!);
 	}
 
 	hubEvents = {
@@ -60,7 +60,7 @@ function displayView(this: MainView, routeInfo: any) {
 		// display the view (empty first)
 		var contentEl = first(view.el, ".main-content");
 		empty(contentEl);
-		display(subViewClass, contentEl);
+		display(subViewClass, contentEl!);
 
 		// change the current path0
 		view.path0 = path0;
