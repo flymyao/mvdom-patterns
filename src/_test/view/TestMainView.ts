@@ -1,20 +1,17 @@
-import { BaseView, add } from "../../base";
+import { BaseView, addHubEvents } from "../../base";
 import { all, first, display, empty } from "mvdom";
 
 export class TestMainView extends BaseView {
 	path0?: string;
 
-	constructor() {
-		super();
+	// --------- hubEvents Binding --------- //
+	hubEvents = addHubEvents(this.hubEvents, {
+		"routeHub; CHANGE": (routeInfo: any) => {
+			displayView.call(this, routeInfo);
+		}
+	});
+	// --------- /hubEvents Binding --------- //
 
-		// --------- hubEvents Binding --------- //
-		add(this.hubEvents, {
-			"routeHub; CHANGE": (routeInfo: any) => {
-				displayView.call(this, routeInfo);
-			}
-		});
-		// --------- /hubEvents Binding --------- //
-	}
 }
 
 

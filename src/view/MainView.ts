@@ -1,4 +1,4 @@
-import { BaseView, assign, add } from "../base";
+import { BaseView, addHubEvents } from "../base";
 import { display, all, first, empty } from "mvdom";
 import { HomeView } from "./HomeView";
 import { TodoMainView } from "./Todo/TodoMainView";
@@ -25,18 +25,13 @@ export class MainView extends BaseView {
 		display(NotificationView, this.el!);
 	}
 
-	constructor() {
-		super();
-
-		// --------- HubEvents Binding --------- //
-		add(this.hubEvents, {
-			"routeHub; CHANGE": (routeInfo: any) => {
-				displayView.call(this, routeInfo);
-			}
-		})
-		// --------- /HubEvents Binding --------- //
-	}
-
+	// --------- HubEvents Binding --------- //
+	hubEvents = addHubEvents(this.hubEvents, {
+		"routeHub; CHANGE": (routeInfo: any) => {
+			displayView.call(this, routeInfo);
+		}
+	});
+	// --------- /HubEvents Binding --------- //
 }
 
 // --------- Private Methods --------- //

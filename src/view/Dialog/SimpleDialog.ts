@@ -1,30 +1,25 @@
-import { assign } from '../../base';
+import { addDomEvents } from '../../base';
 import { first, append } from 'mvdom';
 import { render } from '../../ts/render';
 import { BaseDialog } from './BaseDialog';
 
 export class SimpleDialog extends BaseDialog {
 
-	// --------- Controller --------- //
+	// --------- Lifecycle Methods --------- //
 	// update the component this.el before it get added to the DOM
 	init() {
 		this.title = "Simple Dialog";
 		this.content = render("SimpleDialog-content");
 	}
+	// --------- /Lifecycle Methods --------- //
 
-	constructor() {
-		super();
-
-		// --------- Events Binding --------- //
-		assign(this.events, {
-			'click; .base-dialog > header': () => {
-				console.log('SimpleDialog click header');
-			}
-		});
-		// --------- /Events Binding --------- //
-
-	}
-	// --------- /Controller --------- //
+	// --------- Dom Event Bindings --------- //
+	events = addDomEvents(this.events, {
+		'click; .base-dialog > header': () => {
+			console.log('SimpleDialog click header');
+		}
+	});
+	// --------- /Dom Event Bindings --------- //
 
 	doClose() {
 		console.log('Simple Dialog delaying close....');

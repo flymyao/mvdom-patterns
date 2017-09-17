@@ -1,4 +1,4 @@
-import { BaseView, assign } from '../../base';
+import { BaseView, addDomEvents } from '../../base';
 import { remove, first, append } from 'mvdom';
 import { render } from '../../ts/render';
 
@@ -14,23 +14,15 @@ export class BaseDialog extends BaseView {
 		append(first(this.el, '.dialog > section.content')!, content, "empty");
 	}
 
-	constructor() {
-		super();
+	events = addDomEvents(this.events, {
+		'click; .base-dialog > header': (evt: Event) => {
+			console.log('BaseDialog click header', evt);
+		},
 
-		// --------- Events Bindings --------- //
-		assign(this.events, {
-			'click; .base-dialog > header': (evt: Event) => {
-				console.log('BaseDialog click header', evt);
-			},
-
-			'click; .do-close': () => {
-				this.doClose();
-			}
-		});
-		// --------- /Events Bindings --------- //
-	}
-
-
+		'click; .do-close': () => {
+			this.doClose();
+		}
+	});
 
 	// --------- Controller Methods --------- //
 	create(data?: any) {

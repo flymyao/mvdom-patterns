@@ -1,4 +1,4 @@
-import { BaseView, add } from "../base";
+import { BaseView, addHubEvents } from "../base";
 import { on, remove } from "mvdom";
 import { render } from "../ts/render";
 
@@ -7,16 +7,15 @@ export class NotificationView extends BaseView {
 		var view = this; // best practice, set the view variable first. 
 	}
 
-	constructor() {
-		super();
-		add(this.hubEvents, {
-			// On topic notify on notifHub, we show the message. 
-			"notifHub; notify": (notifMessage: any, evtInfo: any) => {
-				// For now, the scheme is to have the message being the content and the notification label be the event type
-				addItem.call(this, notifMessage);
-			}
-		})
-	}
+	// --------- Hub Event Bindings --------- //
+	hubEvents = addHubEvents(this.hubEvents, {
+		// On topic notify on notifHub, we show the message. 
+		"notifHub; notify": (notifMessage: any, evtInfo: any) => {
+			// For now, the scheme is to have the message being the content and the notification label be the event type
+			addItem.call(this, notifMessage);
+		}
+	});
+	// --------- /Hub Event Bindings --------- //
 
 }
 

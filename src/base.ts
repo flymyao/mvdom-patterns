@@ -27,12 +27,22 @@ export class BaseView implements View {
 	}
 }
 
-export function assign<T>(target: T, source: T): T {
-	return Object.assign(target, source);
+export function addDomEvents(target: EventBindings, source: EventBindings) {
+	return Object.assign(target, source) as typeof target;
 }
 
-export function add<T>(target: T[], source: T): T[] {
+export function addHubEvents(target: HubBindings[], source: HubBindings) {
 	target.push(source);
 	return target;
 }
+
+
+// export function assign<T>(target: T, source: T): T {
+// 	return Object.assign(target, source);
+// }
+
+// export function add<T>(target: T[], source: T): T[] {
+// 	target.push(source);
+// 	return target;
+// }
 

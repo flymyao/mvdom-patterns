@@ -1,4 +1,4 @@
-import { BaseView, assign } from '../../base';
+import { BaseView, addDomEvents } from '../../base';
 import { display, first } from 'mvdom';
 import { BaseDialog } from './BaseDialog';
 import { SimpleDialog } from './SimpleDialog';
@@ -6,21 +6,15 @@ import { SimpleDialog } from './SimpleDialog';
 export class DialogDemoView extends BaseView {
 
 
-	constructor() {
-		super();
+	// --------- Dom Event Bindings --------- //
+	events = addDomEvents(this.events, {
+		"click; .show.basic": () => {
+			display(new BaseDialog(), first('body')!);
+		},
 
-		// --------- Events Binding --------- //
-		assign(this.events, {
-			"click; .show.basic": () => {
-				display(new BaseDialog(), first('body')!);
-			},
-
-			"click; .show.simple": () => {
-				display(new SimpleDialog(), first('body')!);
-			}
-		});
-		// --------- /Events Binding --------- //
-
-	}
-
+		"click; .show.simple": () => {
+			display(new SimpleDialog(), first('body')!);
+		}
+	});
+	// --------- /Dom Event Bindings --------- //
 }

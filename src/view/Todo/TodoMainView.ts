@@ -1,4 +1,4 @@
-import { BaseView, assign, add } from "../../base";
+import { BaseView, addDomEvents, addHubEvents } from "../../base";
 import { hub, append, all, first, prev, next, pull } from "mvdom";
 import { guard, entityRef } from "../../ts/utils";
 import { dso } from "../../ts/ds";
@@ -21,133 +21,127 @@ export class TodoMainView extends BaseView {
 		refreshViewFromRoute.call(this);
 	}
 
-	constructor() {
-		super();
+	// --------- HubEvents Binding --------- //
+	hubEvents = addHubEvents(this.hubEvents, {
+		"dataHub; Todo": (data: any, info: any) => {
+			refreshList.call(this);
+		},
 
-		// --------- Events Binding --------- //
-		assign(this.events, {
+		"routeHub; CHANGE": (routeInfo: any) => {
+			refreshViewFromRoute.call(this);
+		}
+	});
+	// --------- /HubEvents Binding --------- //
 
-			// all input - we disable the default Tab UI event handling, as it will be custom
-			"keydown; input": (evt: KeyboardEvent) => {
-				if (evt.key === "Tab") {
-					evt.preventDefault();
-				}
-			},
+	// --------- Dom Event Bindings --------- //
+	events = addDomEvents(this.events, {
+		// all input - we disable the default Tab UI event handling, as it will be custom
+		"keydown; input": (evt: KeyboardEvent) => {
+			if (evt.key === "Tab") {
+				evt.preventDefault();
+			}
+		},
 
-			// --------- new todo UI Events --------- //
-			// Handle the keyup on the input new-todo 
-			// enter to create new, and tab to go to first item in the list.
-			"keyup; input.new-todo": (evt: KeyboardEvent) => {
-				var inputEl = <HTMLInputElement>evt.target;
+		// --------- new todo UI Events --------- //
+		// Handle the keyup on the input new-todo 
+		// enter to create new, and tab to go to first item in the list.
+		"keyup; input.new-todo": (evt: KeyboardEvent) => {
+			var inputEl = <HTMLInputElement>evt.target;
 
-				// press enter
-				if (evt.key === "Enter") {
-					var val = inputEl.value.trim();
-					if (val.length > 0) {
-						todoDso.create({ subject: val }).then(function () {
-							inputEl.value = "";
-							// send to the notification
-							hub("notifHub").pub("notify", { type: "info", content: "<strong>New task created:</strong> " + val });
-						});
-					} else {
-						hub("notifHub").pub("notify", { type: "error", content: "<strong>ERROR:</strong> An empty task is not a task." });
-					}
-				}
-				//press tab, make editable the first item in the list
-				else if (evt.key === "Tab") {
-					var todoEntityRef = entityRef(first(this.el!, ".items .todo-item")!);
-					if (todoEntityRef) {
-						editTodo.call(this, todoEntityRef);
-					}
-				}
-			},
-			// --------- /new todo UI Events --------- //
-
-			// --------- todo-item UI Events --------- //
-			// toggle check status
-			"click; .ctrl-check": (evt: MouseEvent) => {
-				var eRef = entityRef(evt.target, "Todo");
-				eRef = guard(eRef, "No entity reference found for " + evt.target);
-
-				// we toggle the done value (yes, from the UI state, as this is what the user intent)
-				var done = !eRef.el.classList.contains("todo-done");
-
-				// we update the todo vas the dataservice API. 
-				todoDso.update(eRef.id, { done: done }).then(function (newEntity: any) {
-					if (done) {
-						hub("notifHub").pub("notify", { type: "info", content: "<strong>Task done:</strong> " + newEntity.subject });
-					} else {
-						hub("notifHub").pub("notify", { type: "warning", content: "<strong>Task undone:</strong> " + newEntity.subject });
-					}
-				});
-			},
-
-			// double clicking on a label makes it editable
-			"dblclick; label": (evt: MouseEvent) => {
-				editTodo.call(this, entityRef(evt.target, "Todo"));
-			},
-
-			// when the todo-item input get focus out (we cancel by default)
-			"focusout; .todo-item input": (evt: MouseEvent) => {
-				var view = this;
-				var eRef = entityRef(evt.target, "Todo");
-				eRef = guard(eRef, "No entity reference found for " + evt.target);
-
-				// IMPORTANT: Here we check if the entityEl state is editing, if not we do nothing. 
-				//            Ohterwise, we might do the remove inputEl twice with the blur event flow of this element.
-				if (eRef.el.classList.contains("editing")) {
-					cancelEditing.call(view, eRef);
-				}
-			},
-
-			// when user type enter or tab in the todo-item input
-			"keyup; .todo-item input": (evt: KeyboardEvent) => {
-				var view = this;
-				var inputEl = evt.target;
-				var eRef = entityRef(inputEl, "Todo");
-				eRef = guard(eRef, "No entity reference found for " + evt.target);
-				var s = ".items .todo-item[data-entity-id='" + eRef.id + "']";
-
-				switch (evt.key) {
-					case "Enter":
-						commitEditing.call(view, eRef).then(() => {
-							// focus the input on enter
-							this.newTodoIpt.focus();
-						});
-						break;
-
-					case "Tab":
-						commitEditing.call(view, eRef).then(() => {
-							var entityEl = first(view.el, s);
-							var siblingTodoEl = (evt.shiftKey) ? prev(entityEl, ".todo-item") : next(entityEl, ".todo-item");
-							if (siblingTodoEl) {
-								var siblingTodoRef = entityRef(siblingTodoEl, "Todo");
-								editTodo.call(this, siblingTodoRef);
-							} else {
-								// todo: need to focus on the first new-todo
-								view.newTodoIpt.focus();
-							}
-						});
-						break;
+			// press enter
+			if (evt.key === "Enter") {
+				var val = inputEl.value.trim();
+				if (val.length > 0) {
+					todoDso.create({ subject: val }).then(function () {
+						inputEl.value = "";
+						// send to the notification
+						hub("notifHub").pub("notify", { type: "info", content: "<strong>New task created:</strong> " + val });
+					});
+				} else {
+					hub("notifHub").pub("notify", { type: "error", content: "<strong>ERROR:</strong> An empty task is not a task." });
 				}
 			}
-			// --------- /todo-item UI Events --------- //
-		});
-		// --------- /Events Binding --------- //
-
-		// --------- HubEvents Binding --------- //
-		add(this.hubEvents, {
-
-			"dataHub; Todo": (data: any, info: any) => {
-				refreshList.call(this);
-			},
-
-			"routeHub; CHANGE": (routeInfo: any) => {
-				refreshViewFromRoute.call(this);
+			//press tab, make editable the first item in the list
+			else if (evt.key === "Tab") {
+				var todoEntityRef = entityRef(first(this.el!, ".items .todo-item")!);
+				if (todoEntityRef) {
+					editTodo.call(this, todoEntityRef);
+				}
 			}
-		});
-		// --------- /HubEvents Binding --------- //
-	}
+		},
+		// --------- /new todo UI Events --------- //
+
+		// --------- todo-item UI Events --------- //
+		// toggle check status
+		"click; .ctrl-check": (evt: MouseEvent) => {
+			var eRef = entityRef(evt.target, "Todo");
+			eRef = guard(eRef, "No entity reference found for " + evt.target);
+
+			// we toggle the done value (yes, from the UI state, as this is what the user intent)
+			var done = !eRef.el.classList.contains("todo-done");
+
+			// we update the todo vas the dataservice API. 
+			todoDso.update(eRef.id, { done: done }).then(function (newEntity: any) {
+				if (done) {
+					hub("notifHub").pub("notify", { type: "info", content: "<strong>Task done:</strong> " + newEntity.subject });
+				} else {
+					hub("notifHub").pub("notify", { type: "warning", content: "<strong>Task undone:</strong> " + newEntity.subject });
+				}
+			});
+		},
+
+		// double clicking on a label makes it editable
+		"dblclick; label": (evt: MouseEvent) => {
+			editTodo.call(this, entityRef(evt.target, "Todo"));
+		},
+
+		// when the todo-item input get focus out (we cancel by default)
+		"focusout; .todo-item input": (evt: MouseEvent) => {
+			var view = this;
+			var eRef = entityRef(evt.target, "Todo");
+			eRef = guard(eRef, "No entity reference found for " + evt.target);
+
+			// IMPORTANT: Here we check if the entityEl state is editing, if not we do nothing. 
+			//            Ohterwise, we might do the remove inputEl twice with the blur event flow of this element.
+			if (eRef.el.classList.contains("editing")) {
+				cancelEditing.call(view, eRef);
+			}
+		},
+
+		// when user type enter or tab in the todo-item input
+		"keyup; .todo-item input": (evt: KeyboardEvent) => {
+			var view = this;
+			var inputEl = evt.target;
+			var eRef = entityRef(inputEl, "Todo");
+			eRef = guard(eRef, "No entity reference found for " + evt.target);
+			var s = ".items .todo-item[data-entity-id='" + eRef.id + "']";
+
+			switch (evt.key) {
+				case "Enter":
+					commitEditing.call(view, eRef).then(() => {
+						// focus the input on enter
+						this.newTodoIpt.focus();
+					});
+					break;
+
+				case "Tab":
+					commitEditing.call(view, eRef).then(() => {
+						var entityEl = first(view.el, s);
+						var siblingTodoEl = (evt.shiftKey) ? prev(entityEl, ".todo-item") : next(entityEl, ".todo-item");
+						if (siblingTodoEl) {
+							var siblingTodoRef = entityRef(siblingTodoEl, "Todo");
+							editTodo.call(this, siblingTodoRef);
+						} else {
+							// todo: need to focus on the first new-todo
+							view.newTodoIpt.focus();
+						}
+					});
+					break;
+			}
+		}
+		// --------- /todo-item UI Events --------- //
+	});
+	// --------- /Dom Event Bindings --------- //
 
 }
 
