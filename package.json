@@ -22,7 +22,8 @@
     "hapi": "^16.6.0",
     "inert": "^4.2.1",
     "mvdom": "^0.5.5",
-    "os-top": "0.0.4"
+    "os-top": "0.0.4",
+    "ts-node": "^3.3.0"
   },
   "devDependencies": {
     "cmdrouter": "^0.2.0",
@@ -43,7 +44,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./mock-server/start.js",
+    "start": "./node_modules/.bin/ts-node -P ./server/ ./server/start",
     "build": "node ./scripts/build.js",
     "watch": "node ./scripts/build watch"
   },
