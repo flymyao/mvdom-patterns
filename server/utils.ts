@@ -1,7 +1,6 @@
 
-
 // cast "primitive" types
-export function as(val, type) {
+export function as(val: any, type: any) {
 	return type(val);
 }
 
@@ -13,7 +12,7 @@ var OBJ = "object";
 
 
 // return true if the value is null, undefined, empty array, empty object, or empty string
-export function isEmpty(v) {
+export function isEmpty(v: any) {
 	if (v == null) {
 		return true;
 	}

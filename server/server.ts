@@ -27,7 +27,7 @@ class Server {
 	cfg: any;
 	hapiServer: any;
 
-	async init(cfg) {
+	async init(cfg: any) {
 
 		this.cfg = Object.assign({}, defaultCfg, cfg);
 
@@ -45,7 +45,7 @@ class Server {
 			path: '/{path*}',
 			handler: {
 				directory: {
-					path: (request) => {
+					path: (request: any) => {
 						console.log(' > ' + new Date().getTime() + ' ' + request.method.toUpperCase() + ' ' + request.path);
 						return this.cfg.clientRoot;
 					},
@@ -60,7 +60,7 @@ class Server {
 	}
 
 	// Load hapi route array 
-	load(routes) {
+	load(routes: any[]) {
 		if (typeof routes === 'undefined' || !(routes instanceof Array)) {
 			throw new Error("App - cannot load routes " + routes);
 		}
@@ -72,7 +72,7 @@ class Server {
 
 	start() {
 		// Start the server
-		this.hapiServer.start((err) => {
+		this.hapiServer.start((err: any) => {
 
 			if (err) {
 				throw err;

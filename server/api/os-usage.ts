@@ -1,9 +1,10 @@
 import * as top from "os-top";
 
+
 const baseURI = "/api";
 
 
-async function wait(ms) {
+async function wait(ms: number) {
 	return new Promise((resolve, reject) => {
 		setTimeout(() => {
 			resolve();
@@ -17,7 +18,7 @@ export const routes: any[] = [];
 routes.push({
 	method: 'GET',
 	path: baseURI + "/cpuUsage",
-	handler: async function (request, reply) {
+	handler: async function (request: any, reply: any) {
 		touchLastRequested();
 		reply(cpuStats);
 	}
@@ -26,7 +27,7 @@ routes.push({
 routes.push({
 	method: 'GET',
 	path: baseURI + "/topCpuProcs",
-	handler: function (request, reply) {
+	handler: function (request: any, reply: any) {
 		touchLastRequested();
 		reply(procs);
 	}
@@ -36,18 +37,17 @@ routes.push({
 routes.push({
 	method: 'GET',
 	path: baseURI + "/memUsage",
-	handler: function (request, reply) {
+	handler: function (request: any, reply: any) {
 		touchLastRequested();
 		reply(memStats);
 	}
 });
 
 
-
 routes.push({
 	method: 'GET',
 	path: baseURI + "/topMemProcs",
-	handler: function (request, reply) {
+	handler: function (request: any, reply: any) {
 		touchLastRequested();
 		reply(procs);
 	}
@@ -56,15 +56,15 @@ routes.push({
 
 
 // --------- Data Capture --------- //
-var lastRequestedMs = null;
+var lastRequestedMs: any = null;
 var maxIdle = 3000; // time to stop the fetch if nobody is requesting the data
 
 var arrayLimit = 10;
 var delay = 1000; // delay in beteween top.fetch
 
-var cpuStats = [];
-var memStats = [];
-var procs = [];
+var cpuStats: any[] = [];
+var memStats: any[] = [];
+var procs: any[] = [];
 
 var on = false;
 
@@ -92,14 +92,14 @@ function topFetch() {
 		return;
 	}
 
-	top.fetch().then(function (data) {
+	top.fetch().then(function (data: any) {
 		_addData(cpuStats, data.stats.cpu);
 		_addData(memStats, data.stats.mem);
 		procs = data.procs;
 		// TODO: need to have the topCpuProcs and the topMemProcs
 
 		setTimeout(topFetch, delay);
-	}).catch(function (ex) {
+	}).catch(function (ex: any) {
 		console.log("FAIL - top.fetch - " + ex);
 	});
 }
@@ -109,7 +109,7 @@ function topFetch() {
 
 
 // private function that add an new data item to its list, add time, max the list at usageLimit 
-function _addData(list, data) {
+function _addData(list: any, data: any) {
 	const nowMs = new Date().getTime();
 
 	data.time = nowMs;
