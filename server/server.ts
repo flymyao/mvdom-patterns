@@ -1,4 +1,4 @@
-import * as Hapi from 'hapi';
+import { Server as HapiServer, PluginRegistrationObject, RouteConfiguration, CorsConfigurationObject } from 'hapi';
 import * as Inert from 'inert';
 import { exec } from 'child_process';
 
@@ -6,15 +6,26 @@ import { routes as osUsageRoutes } from './api/os-usage';
 
 var isWin = /^win/.test(process.platform);
 
+// Note: this is to pass the type checking
+var inert = Inert as PluginRegistrationObject<{}>;
+
+export interface Config {
+	host?: string;
+	port?: number;
+	clientRoot?: string;
+	routes?: {
+		cors?: true | CorsConfigurationObject;
+	}
+
+}
 // Default app config. 
 // Depending on the properties, it will be used for the connection properties or 
-var defaultCfg = {
-	//host: 'localhost',    // connection host (if we do this only does not work when deployed)
+var defaultCfg: Config = {
+	//host: 'localhost',    // connection host (if we do this, it won't work when deploy in another host)
 	port: 8080,			    // connection port
 	clientRoot: process.cwd() + '/web/', // root of the client files (which will be served statically)	
-	routes: {
-		cors:
-		{
+	routes: { // his is for cors
+		cors: {
 			origin: ['*'],
 			additionalHeaders: ["Accept-language"]
 		}
@@ -24,20 +35,20 @@ var defaultCfg = {
 
 // App is a simple convenience Hapi/Server wrapper. 
 class Server {
-	cfg: any;
-	hapiServer: any;
+	cfg: Config;
+	hapiServer: HapiServer;
 
-	async init(cfg: any) {
+	async init(cfg: Config) {
 
 		this.cfg = Object.assign({}, defaultCfg, cfg);
 
-		this.hapiServer = new Hapi.Server();
+		this.hapiServer = new HapiServer();
 
 		// register plugins
-		this.hapiServer.register(Inert, function () { });
+		this.hapiServer.register(inert, function () { });
 
 		// start server
-		this.hapiServer.connection({ host: this.cfg.host, port: this.cfg.port });
+		this.hapiServer.connection({ host: this.cfg.host, port: this.cfg.port, routes: this.cfg.routes });
 
 		// Bind static files to Inert plugin (this will server )
 		this.hapiServer.route({
@@ -56,18 +67,7 @@ class Server {
 		});
 
 		// load the osUsage API routes
-		this.load(osUsageRoutes);
-	}
-
-	// Load hapi route array 
-	load(routes: any[]) {
-		if (typeof routes === 'undefined' || !(routes instanceof Array)) {
-			throw new Error("App - cannot load routes " + routes);
-		}
-
-		for (var route of routes) {
-			this.hapiServer.route(route);
-		}
+		this.hapiServer.route(osUsageRoutes);
 	}
 
 	start() {
@@ -85,7 +85,7 @@ class Server {
 				exec('open http://localhost:' + this.cfg.port, function (error, stdout, stderr) { });
 			}
 
-			console.log('Server running at:', this.hapiServer.info.uri);
+			console.log('Server running at:', this.hapiServer.info!.uri);
 		});
 	}
 }

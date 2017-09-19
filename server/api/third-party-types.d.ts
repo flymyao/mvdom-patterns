@@ -3,5 +3,4 @@ declare module "os-top" {
 }
 
 declare module "inert" {
-
 }

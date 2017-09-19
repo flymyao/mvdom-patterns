@@ -1,12 +1,12 @@
 
-import { server } from './server';
+import { server, Config } from './server';
 
 // get the eventual port from the argv
 var params = (process.argv.length >= 3) ? process.argv.slice(2) : [];
-var opts: { port?: string } = {};
+var opts: Config = {};
 
 if (params.length > 0) {
-	opts.port = params[0];
+	opts.port = parseInt(params[0]);
 }
 
 // init and start the mock server

@@ -1,4 +1,8 @@
+import { RouteConfiguration, Request, ReplyNoContinue } from 'hapi';
+
+// TODO: need to use the fake-top module soon and deprecreate the os-top (focus on demo, and not the hard problem of doing a top crossplatform)
 import * as top from "os-top";
+// import { fetch } from './fake-top';
 
 
 const baseURI = "/api";
@@ -13,12 +17,12 @@ async function wait(ms: number) {
 }
 
 // --------- Usage APIs --------- //
-export const routes: any[] = [];
+export const routes: RouteConfiguration[] = [];
 
 routes.push({
 	method: 'GET',
 	path: baseURI + "/cpuUsage",
-	handler: async function (request: any, reply: any) {
+	handler: async function (request: Request, reply: ReplyNoContinue) {
 		touchLastRequested();
 		reply(cpuStats);
 	}
@@ -27,27 +31,25 @@ routes.push({
 routes.push({
 	method: 'GET',
 	path: baseURI + "/topCpuProcs",
-	handler: function (request: any, reply: any) {
+	handler: function (request: Request, reply: ReplyNoContinue) {
 		touchLastRequested();
 		reply(procs);
 	}
 });
 
-
 routes.push({
 	method: 'GET',
 	path: baseURI + "/memUsage",
-	handler: function (request: any, reply: any) {
+	handler: function (request: Request, reply: ReplyNoContinue) {
 		touchLastRequested();
 		reply(memStats);
 	}
 });
 
-
 routes.push({
 	method: 'GET',
 	path: baseURI + "/topMemProcs",
-	handler: function (request: any, reply: any) {
+	handler: function (request: Request, reply: ReplyNoContinue) {
 		touchLastRequested();
 		reply(procs);
 	}
@@ -56,7 +58,7 @@ routes.push({
 
 
 // --------- Data Capture --------- //
-var lastRequestedMs: any = null;
+var lastRequestedMs: number | null = null;
 var maxIdle = 3000; // time to stop the fetch if nobody is requesting the data
 
 var arrayLimit = 10;
@@ -103,9 +105,6 @@ function topFetch() {
 		console.log("FAIL - top.fetch - " + ex);
 	});
 }
-
-
-
 
 
 // private function that add an new data item to its list, add time, max the list at usageLimit 
