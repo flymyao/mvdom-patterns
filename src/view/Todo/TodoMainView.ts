@@ -1,5 +1,5 @@
 import { BaseView, addDomEvents, addHubEvents } from "../../base";
-import { hub, append, all, first, prev, next, pull } from "mvdom";
+import {hub, append, all, first, prev, next, pull, frag} from "mvdom";
 import { guard, entityRef } from "../../ts/utils";
 import { dso } from "../../ts/ds";
 import { route } from "../../ts/route";
@@ -202,7 +202,7 @@ function editTodo(this: TodoMainView, entityRef: any) {
 
 	// create the input HTML and add it to the entity element
 	var inputHTML = render("TodoMainView-input-edit", { subject: currentSubject });
-	todoEl.insertAdjacentHTML("beforeend", inputHTML);
+	append(todoEl,inputHTML);
 
 	// set the focus and selection on the input element
 	var inputEl = <HTMLInputElement>first(todoEl, "input");

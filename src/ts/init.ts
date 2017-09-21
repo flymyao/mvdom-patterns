@@ -2,6 +2,7 @@ import { empty, trigger, first } from "mvdom";
 import { ds } from "./ds";
 import { DsoMem } from "./dsoMem";
 import { ajax } from "./ajax"
+import {DsoRemote} from "./dsoRemote";
 
 /**
  * This module finish loading all of the assets (i.e. svg symbols) and triggers as "APP_LOADED". The APP_LOADED event will be listened in the 
@@ -14,7 +15,7 @@ import { ajax } from "./ajax"
 // --------- DataService Initialization --------- //
 // For the demo, we will have the Memory Dso fallback for any type the application might use. 	
 ds.fallback(function (type) {
-	return new DsoMem(type);
+	return new DsoRemote(type);
 });
 
 // For production, you might want to have some Entity DSO object that you would register as follow

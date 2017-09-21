@@ -2,7 +2,8 @@ import { Server as HapiServer, PluginRegistrationObject, RouteConfiguration, Cor
 import * as Inert from 'inert';
 import { exec } from 'child_process';
 
-import { routes as osUsageRoutes } from './api/os-usage';
+import { routes as curdRoutes } from './api/crud';
+import { routes as usageRoutes } from './api/os-usage';
 
 var isWin = /^win/.test(process.platform);
 
@@ -67,7 +68,8 @@ class Server {
 		});
 
 		// load the osUsage API routes
-		this.hapiServer.route(osUsageRoutes);
+		this.hapiServer.route(curdRoutes);
+        this.hapiServer.route(usageRoutes);
 	}
 
 	start() {
@@ -79,11 +81,11 @@ class Server {
 			}
 
 			// open browser
-			if (isWin) {
-				exec('start http://localhost:' + this.cfg.port, function (error, stdout, stderr) { });
-			} else {
-				exec('open http://localhost:' + this.cfg.port, function (error, stdout, stderr) { });
-			}
+			// if (isWin) {
+			// 	exec('start http://localhost:' + this.cfg.port, function (error, stdout, stderr) { });
+			// } else {
+			// 	exec('open http://localhost:' + this.cfg.port, function (error, stdout, stderr) { });
+			// }
 
 			console.log('Server running at:', this.hapiServer.info!.uri);
 		});
